@@ -37,14 +37,14 @@ npx tsc && npm start
 
 ## Startup command for Rasberry Pi or other linux-based server device
 The .env file has to be present on the machine we run this on.
-This file needs to contain the following paramaters: 
-DISCORD_TOKEN=
-DISCORD_HOARD_CHANNEL_ID=
-DATABASE_HOST=
-DATABASE_USER=
-DATABASE_PASSWORD=
-DATABASE_PORT=
-DATABASE_NAME=
+This file needs to contain the following paramaters: \n
+DISCORD_TOKEN=\n
+DISCORD_HOARD_CHANNEL_ID=\n
+DATABASE_HOST=\n
+DATABASE_USER=\n
+DATABASE_PASSWORD=\n
+DATABASE_PORT=\n
+DATABASE_NAME=\n
 ```
 rm -r -f atlas/ && git clone https://github.com/thomaskaviani/atlas.git && cp .env atlas/.env && cd atlas && npm start
 ```
