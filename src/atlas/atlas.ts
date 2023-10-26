@@ -4,6 +4,7 @@ import {TYPES} from "./../types"
 import {LoggingService} from '../services/logging-service';
 import {Client, Message, TextChannel} from "discord.js";
 import {Commands} from './commands';
+import {Messages} from './messages';
 import {GameService} from '../services/game-service';
 import BoardGame from '../domain/boardgame';
 import CollectionLine from '../domain/collection-line';
@@ -73,40 +74,61 @@ export class Atlas {
     this.discordClient.on('messageCreate', (message: Message) => {
       if (this.isValidAtlasChannel())
         LoggingService.logDiscordMessage(message);
+        LoggingService.log("*" + message.content + "*");
         this.handleDiscordMessage(message);
     });
   }
 
   private handleDiscordMessage(message: Message): void {
-    this.handleTestCommand(message);
+    this.handleAtlasCommand(message);
     this.handleAddGameCommand(message);
+    this.handleRemoveGameCommand(message);
     this.handleOwnerCommand(message);
     this.handleGamesCommand(message);
   }
 
-  private handleTestCommand(message: Message) {
-    if (this.isTestCommand(message)) {
-      message.reply({ content:
-        "Hi, I'm ready to collect some boardgames 🎲🏰🧙‍♂️\n"+
-        "You can add a game to our collection with the following command:\n" +
-        "!addGame Monopoly", flags: [ 4096 ]});
+  private handleAtlasCommand(message: Message) {
+    if (this.isAtlasCommand(message)) {
+      Messages.replySilent(message, Messages.ATLAS_MESSAGE);
+    }
+  }
+
+  private async handleRemoveGameCommand(message: Message) {
+    if (this.isRemoveGameCommand(message) && this.isValidAtlasChannel()) {
+      const gameString = message.content.slice(12).toLowerCase();
+      if (!gameString) {
+        Messages.replySilent(message, Messages.REMOVE_GAME_INCOMPLETE_COMMAND);
+        return;
+      }
+      if (await this.doesOwnerHaveGame(gameString, message.author.username)) {
+        this.gameService.deleteCollectionLine(gameString, message.author.username);
+        this.updateAtlasMessage();
+        Messages.replySilent(message, Messages.REMOVED_FROM_GAME + gameString);
+      } else {
+        Messages.replySilent(message, Messages.DONT_OWN_GAME_MESSAGE + gameString);
+      }
     }
   }
 
   private async handleAddGameCommand(message: Message) {
     if (this.isAddGameCommand(message) && this.isValidAtlasChannel()) {
-      const gameString = message.content.slice(9);
+      const gameString = message.content.slice(9).toLowerCase();
+      if (!gameString) {
+        Messages.replySilent(message, Messages.ADD_GAME_INCOMPLETE_COMMAND);
+        return;
+      }
+
       if (!await this.doesOwnerExists(message.author.username)) {
         this.gameService.saveOwner(message.author.username);
       }
 
       if (!await this.doesBoardGameExists(gameString)) {
-        message.reply({ content: "I don't know this game yet, thank you for expanding our collection", flags: [ 4096 ]});
+        Messages.replySilent(message, Messages.GAME_DOES_NOT_EXIST_ADD_NOW_MESSAGE);
         this.gameService.saveBoardGame(gameString, 0);
       }
 
       if (!await this.doesOwnerHaveGame(gameString, message.author.username)) {
-        message.reply({ content: "I'm adding you as an owner of " + gameString, flags: [ 4096 ]});
+        Messages.replySilent(message, Messages.GAME_ADD_OWNER_MESSAGE + gameString);
         this.gameService.saveCollectionLine(gameString, message.author.username);
         this.updateAtlasMessage();
       }
@@ -115,17 +137,22 @@ export class Atlas {
 
   private async handleOwnerCommand(message: Message) {
     if (this.isOwnersCommand(message)) {
-      const gameString = message.content.slice(8);
-      console.log(gameString);
+      const gameString = message.content.slice(8).toLowerCase();
+      if (!gameString) {
+        Messages.replySilent(message, Messages.GAMES_INCOMPLETE_COMMAND);
+        return;
+      }
       if (!await this.doesBoardGameExists(gameString)) {
-          message.reply({ content: "This game is not present in our collection", flags: [ 4096 ]});
+        Messages.replySilent(message, Messages.bold(gameString) + Messages.GAME_DOES_NOT_EXIST_MESSAGE);
       } else {
         let collectionLinesForBoardGame: CollectionLine[] = await this.gameService.retrieveLinesForBoardGame(gameString);
         let ownerString: string = '';
-        for (let collectionLine of collectionLinesForBoardGame) {
-          ownerString = ownerString + collectionLine.ownerUserName + "\n";
+
+        for (let ownerOfBoardgame of CollectionLine.getOwners(collectionLinesForBoardGame)) {
+          ownerString = ownerString + ownerOfBoardgame + "\n";
         }
-        message.reply({ content: ownerString, flags: [ 4096 ]});
+
+        Messages.replySilent(message, Messages.bold(Messages.capitalize(gameString)) + Messages.HAS_FOLLOWING_OWNERS + ownerString);
       }
     }
   }
@@ -133,23 +160,21 @@ export class Atlas {
   private async handleGamesCommand(message: Message) {
     if (this.isGamesCommand(message)) {
       const ownerString = message.content.slice(7);
-      console.log(ownerString);
+      if (!ownerString) {
+        Messages.replySilent(message, Messages.OWNER_INCOMPLETE_COMMAND);
+        return;
+      }
       if (!await this.doesOwnerExists(ownerString)) {
-          message.reply({ content: "This user is not an owner of any boardgames", flags: [ 4096 ]});
+        Messages.replySilent(message, Messages.USER_NOT_AN_OWNER_MESSAGE);
       } else {
         let collectionLinesForOwner: CollectionLine[] = await this.gameService.retrieveLinesForOwner(ownerString);
         let boardgameString: string = '';
-        for (let collectionLine of collectionLinesForOwner) {
-          boardgameString = boardgameString + collectionLine.boardGameName + "\n";
-        }
-        message.reply({ content: boardgameString, flags: [ 4096 ]});
-      }
-    }
-  }
 
-  private async handleHelpCommand(message : Message) {
-    if (this.isHelpCommand(message)) {
-      message.reply({ content: "HELP HELP HELP, what are you trying to achieve?", flags: [ 4096 ]});
+        for (let boardGame of CollectionLine.getCapitalizedBoardGameNames(collectionLinesForOwner)) {
+          boardgameString = boardgameString + boardGame + "\n";
+        }
+        Messages.replySilent(message, Messages.bold(ownerString) + Messages.HAS_FOLLOWING_GAMES + boardgameString);
+      }
     }
   }
 
@@ -178,24 +203,24 @@ export class Atlas {
     return collectionLines.length > 0;
   }
 
-  private isTestCommand(message: Message) {
-    return message.content.startsWith(Commands.TEST);
+  private isAtlasCommand(message: Message) {
+    return message.content.toLowerCase() == Commands.ATLAS;
   }
 
   private isAddGameCommand(message: Message) {
-    return message.content.startsWith(Commands.ADD_GAME);
+    return message.content.toLowerCase().startsWith(Commands.ADD_GAME) && message.content.slice(8).startsWith(' ');
   }
 
   private isOwnersCommand(message: Message) {
-    return message.content.startsWith(Commands.OWNER);
+    return message.content.toLowerCase().startsWith(Commands.OWNER) && message.content.slice(7).startsWith(' ');
   }
 
   private isGamesCommand(message: Message) {
-    return message.content.startsWith(Commands.GAMES);
+    return message.content.toLowerCase().startsWith(Commands.GAMES) && message.content.slice(6).startsWith(' ');
   }
 
-  private isHelpCommand(message: Message) {
-    return message.content.startsWith(Commands.HELP);
+  private isRemoveGameCommand(message: Message) {
+    return message.content.toLowerCase().startsWith(Commands.REMOVE_GAME) && message.content.slice(11).startsWith(' ');
   }
 
   private isValidAtlasChannel(): boolean {
@@ -203,7 +228,7 @@ export class Atlas {
   }
 
   private async generateAtlasMessage(): Promise<string> {
-    let map: Map<string, string[]> = new Map<string, string[]>();
+    let boardgameMap: Map<string, string[]> = new Map<string, string[]>();
     let boardgames: BoardGame[] = await this.gameService.retrieveAllBoardGames();
 
     for (let boardgame of boardgames) {
@@ -212,25 +237,12 @@ export class Atlas {
       for (let collectionLine of collectionLinesForGame) {
         owners.push(collectionLine.ownerUserName);
       }
-      map.set(boardgame.name, owners);
+      boardgameMap.set(Messages.capitalize(boardgame.name), owners);
     }
 
-    let sortedMap = new Map([...map.entries()].sort());
-    let atlasMessage = '';
-
-    for (let entry of sortedMap.entries()) {
-      let boardGameLine = "### " + entry[0] + '\n';
-      let authorLine = '';
-      for (let username of entry[1]) {
-        if (authorLine != '') {
-          authorLine = authorLine + ", " + username;
-        } else {
-          authorLine = username;
-        }
-      }
-      atlasMessage = atlasMessage + boardGameLine + authorLine + "\n";
-    }
-
-    return atlasMessage;
+    return '# The Collection 🎲🏰🧙‍♂️\n\n' 
+            + 'This is a collection of all the boardgames I know of. Feel free to add games by using A.T.L.A.S in other channels with the proper commands.\n' 
+            + 'You can always find out how to use A.T.L.A.S by typing **!atlas** \n\n'
+            + Messages.getBoardgameBoxes(boardgameMap) + "\n\n";
   }
 }

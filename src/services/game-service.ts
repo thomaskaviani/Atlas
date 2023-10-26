@@ -6,15 +6,16 @@ import { Op } from "sequelize";
 
 @injectable()
 export class GameService {
+
   async saveBoardGame(name: string, players: number): Promise<BoardGame> { 
-      try {
-          return await BoardGame.create({
-            name: name,
-            players: players,
-          });
-        } catch (err) {
-          throw new Error("Failed to create boardgame");
-        }
+    try {
+      return await BoardGame.create({
+        name: name,
+        players: players,
+      });
+    } catch (err) {
+      throw new Error("Failed to create boardgame");
+    }
   }
 
   async saveOwner(username: string): Promise<Owner> { 
@@ -36,6 +37,14 @@ export class GameService {
         } catch (err) {
           throw new Error("Failed to create collectionline");
         }
+  }
+
+  deleteCollectionLine(name: string, username: string) {
+    this.retrieveLinesForOwnerAndBoardGame(username, name).then((collectionLines: CollectionLine[]) => {
+      collectionLines.forEach(collectionLine => {
+        collectionLine.destroy();
+      });
+    });
   }
 
   async retrieveOwner(username: string): Promise<Owner | null> {

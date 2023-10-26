@@ -1,23 +1,17 @@
 {
   "name": "atlas",
   "version": "0.0.0",
+  "description": "Discord bot for boardgames",
+  "main": "server.js",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "start": "node src/index.js",
+    "build": "webpack",
+    "watch": "tsc -p tsconfig.json -w",
+    "test": "mocha -r ts-node/register \"tests/**/*.spec.ts\""
   },
-  "private": true,
+  "author": "Thomas Kaviani",
+  "license": "ISC",
   "dependencies": {
-    "@angular/animations": "^16.1.0",
-    "@angular/common": "^16.1.0",
-    "@angular/compiler": "^16.1.0",
-    "@angular/core": "^16.1.0",
-    "@angular/forms": "^16.1.0",
-    "@angular/platform-browser": "^16.1.0",
-    "@angular/platform-browser-dynamic": "^16.1.0",
-    "@angular/router": "^16.1.0",
     "@types/chai": "^4.3.9",
     "@types/express": "^4.17.20",
     "@types/mocha": "^10.0.3",
