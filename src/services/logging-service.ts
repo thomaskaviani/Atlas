@@ -6,7 +6,6 @@ export class LoggingService {
         console.log(Date.now() + ": " + message);
     }
 
-
     public static logWithError(message: string, error: any): void {
         console.log(Date.now() + ": " + message, error);
     }
@@ -18,4 +17,4 @@ export class LoggingService {
     public static logObject(object: any) {
         console.log(object);
     }
-} 
+}
