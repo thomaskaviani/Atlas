@@ -15,15 +15,33 @@ export class Atlas {
   private atlasChannel: TextChannel;
   private discordClient: Client;
   private readonly token: string;
+
+  public readonly dbHost: string;
+  public readonly dbUser: string;
+  public readonly dbPassword: string;
+  public readonly dbPort: string;
+  public readonly dbName: string;
+
   private gameService: GameService;
 
   constructor(@inject(TYPES.Client) client: Client,
               @inject(TYPES.Token) token: string,
               @inject(TYPES.ChannelId) channelId: string,
+              @inject(TYPES.DBHost) dbHost: string,
+              @inject(TYPES.DBUser) dbUser: string,
+              @inject(TYPES.DBPassword) dbPassword: string,
+              @inject(TYPES.DBPort) dbPort: string,
+              @inject(TYPES.DBName) dbName: string,
               @inject(TYPES.GameService) gameService: GameService) {
     this.discordClient = client;
     this.token = token;
     this.atlasChannelId = channelId;
+    this.dbHost = dbHost;
+    this.dbUser = dbUser;
+    this.dbPassword = dbPassword;
+    this.dbPort = dbPort;
+    this.dbName = dbName;
+
     this.gameService = gameService;
   }
 

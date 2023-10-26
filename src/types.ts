@@ -4,5 +4,10 @@ export const TYPES = {
     Token: Symbol("Token"),
     ChannelId: Symbol("ChannelId"),
     GameService: Symbol("GameService"),
-    LoggingService: Symbol("LoggingService")
+    LoggingService: Symbol("LoggingService"),
+    DBHost: Symbol("DBHost"),
+    DBUser: Symbol("DBUser"),
+    DBPassword: Symbol("DBPassword"),
+    DBPort: Symbol("DBPort"),
+    DBName: Symbol("DBName")
 };

@@ -4,5 +4,5 @@ export class Commands {
     public static readonly OWNER = '!owners ';
     public static readonly GAMES = '!games ';
     public static readonly HELP = '!help';
-    public static readonly KAVIANI = '!kaviani'; 
+    public static readonly KAVIANI = '!kaviani';
 }
