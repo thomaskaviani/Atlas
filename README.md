@@ -1,6 +1,10 @@
 # Atlas
 
 ## NPM Installs
+
+Packages that were recently removed from this project: webpack-cli
+Packages to add to project: reboot (required python)
+
 ```
 discord.js
 typescript
@@ -15,12 +19,11 @@ sequelize-typescript
 timers-promises
 express
 @types/express
-webpack-cli
 ```
 
 Full command
 ```
-npm install discord.js webpack-cli typescript inversify dotenv @types/node reflect-metadata ts-node pg sequelize sequelize-typescript timers-promises express @types/express
+npm install discord.js typescript inversify dotenv @types/node reflect-metadata ts-node pg sequelize sequelize-typescript timers-promises express @types/express
 ```
 
 ## Running the bot as developer
@@ -42,6 +45,6 @@ git clone https://github.com/thomaskaviani/atlas.git &&
 cp .env atlas/.env && cd atlas && 
 flyway -locations=filesystem:opt/migrations -user=postgres -password=password -url=jdbc:postgresql://localhost:5432/postgres -driver=org.postgresql.Driver -cleanDisabled=false migrate && 
 npx tsc && 
-npm install discord.js webpack-cli typescript inversify dotenv @types/node reflect-metadata ts-node pg sequelize sequelize-typescript timers-promises express @types/express &&
+npm install discord.js typescript inversify dotenv @types/node reflect-metadata ts-node pg sequelize sequelize-typescript timers-promises express @types/express &&
 npm start
 ```
