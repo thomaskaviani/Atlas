@@ -111,7 +111,7 @@ export class Atlas {
                 return;
             }
             if (await this.gameService.doesOwnerHaveGame(boardgame, message.author.username)) {
-                this.gameService.deleteCollectionLine(boardgame, message.author.username);
+                await this.gameService.deleteCollectionLine(boardgame, message.author.username);
                 this.updateAtlasMessage();
                 Messages.replySilent(message, Messages.REMOVED_FROM_GAME + boardgame);
             } else {

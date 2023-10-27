@@ -38,7 +38,7 @@ export class GameService {
 
     async saveCollectionLine(boardgame: string, owner: string): Promise<CollectionLine> {
         try {
-            LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_CREATED_FAILED, boardgame, owner);
+            LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_CREATING, boardgame, owner);
             return await CollectionLine.create({
                 boardGameName: boardgame,
                 ownerUserName: owner
@@ -49,12 +49,13 @@ export class GameService {
         }
     }
 
-    deleteCollectionLine(boardgame: string, owner: string) {
-        this.retrieveLinesForOwnerAndBoardGame(owner, boardgame).then((collectionLines: CollectionLine[]) => {
-            collectionLines.forEach(collectionLine => {
-                collectionLine.destroy().then(x => LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_DELETED, boardgame, owner));
-            });
-        });
+    async deleteCollectionLine(boardgame: string, owner: string) {
+        await CollectionLine.destroy({
+            where: {
+                boardGameName: boardgame,
+                ownerUserName: owner
+            }
+          });
     }
 
     async retrieveOwner(owner: string): Promise<Owner | null> {
