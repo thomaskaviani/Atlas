@@ -3,7 +3,6 @@
 ## NPM Installs
 
 Packages that were recently removed from this project: webpack-cli
-Packages to add to project: reboot (required python)
 
 ```
 discord.js
