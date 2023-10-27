@@ -9,6 +9,7 @@
 # Node
 npm-debug.log
 yarn-error.log
+/node_modules
 
 # IDEs and editors
 .idea/
@@ -40,3 +41,5 @@ testem.log
 .DS_Store
 Thumbs.db
 /.env
+/package-lock.json
+
