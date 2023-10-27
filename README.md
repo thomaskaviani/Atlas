@@ -36,26 +36,12 @@ npx tsc && npm start
 ```
 
 ## Startup command for Rasberry Pi or other linux-based server device
-The .env & flyway.conf file has to be present in the root folder on the machine we run this on.
-```
-rm -r -f atlas/ && git clone https://github.com/thomaskaviani/atlas.git && cp .env atlas/.env && cp flyway.conf atlas/flyway.conf && cd atlas && flyway -configFile=flyway.conf migrate && npm start
-```
+Make sure the community edition of Flyway CLI is installed on the device.
 
-## Flyway CLI 
+Make sure Git CLI is installed on the deviceB.
 
-Make sure a flyway.conf file is present in the root folder on the machine we run this on.
+The .env file has to be present in the root folder on the machine we run this on.
 
-flyway.conf file:
 ```
-flyway.locations=filesystem:opt/migrations/
-flyway.driver=org.postgresql.Driver
-flyway.url=jdbc:postgresql://localhost:5432/postgres
-flyway.user=postgres
-flyway.password=********
+rm -r -f atlas/ && git clone https://github.com/thomaskaviani/atlas.git && cp .env atlas/.env && cd atlas && flyway -locations=filesystem:opt/migrations -user=postgres -password=password -url=jdbc:postgresql://localhost:5432/postgres -driver=org.postgresql.Driver -cleanDisabled=false migrate && npm start
 ```
-
-run the following flyway command before startup app
-```
-flyway -configFile=flyway.conf migrate
-```
-
