@@ -32,7 +32,7 @@ export class Messages {
     }
 
     public static capitalize(message: string): string {
-        return message.replace(/(?:^|\s|["'([{])+\S/g, match => match.toUpperCase());
+        return message.toLowerCase().replace(/(?:^|\s|["'([{])+\S/g, match => match.toUpperCase());
     }
 
     public static bold(message: string): string {

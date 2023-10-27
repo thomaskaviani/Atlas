@@ -26,7 +26,7 @@ export default class CollectionLine extends Model {
         collectionLines.forEach((collectionLine: CollectionLine) => {
           boardGamesForOwner.push(Messages.capitalize(collectionLine.boardGameName));
         });
-        return boardGamesForOwner.sort();
+        return [...new Set(boardGamesForOwner.sort())];
     }
 
     public static getOwners(collectionLines: CollectionLine[]): string[] {
@@ -34,7 +34,7 @@ export default class CollectionLine extends Model {
         collectionLines.forEach((collectionLine: CollectionLine) => {
             ownersOfBoardgame.push(collectionLine.ownerUserName);
         });
-        return ownersOfBoardgame.sort();
+        return [...new Set(ownersOfBoardgame.sort())];
     }
 
 }
