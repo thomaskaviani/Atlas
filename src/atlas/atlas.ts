@@ -82,6 +82,8 @@ export class Atlas {
 
     private handleDiscordMessage(message: Message): void {
         Atlas.handleAtlasCommand(message);
+        Atlas.handleRebootCommand(message);
+
         void this.handleAddGameCommand(message);
         void this.handleRemoveGameCommand(message);
         void this.handleOwnerCommand(message);
@@ -91,6 +93,12 @@ export class Atlas {
     private static handleAtlasCommand(message: Message) {
         if (Commands.isAtlasCommand(message)) {
             Messages.replySilent(message, Messages.ATLAS_MESSAGE);
+        }
+    }
+
+    private static handleRebootCommand(message: Message) {
+        if (Commands.isRebootCommand(message) && message.author.username == 'thomaskaviani') {
+            //TODO to implement remote reboot
         }
     }
 

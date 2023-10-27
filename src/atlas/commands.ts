@@ -6,9 +6,14 @@ export class Commands {
     public static readonly REMOVE_GAME = '!removegame';
     public static readonly OWNER = '!owners';
     public static readonly GAMES = '!games';
+    public static readonly REBOOT = '!reboot';
 
     public static isAtlasCommand(message: Message) {
         return message.content.toLowerCase() == Commands.ATLAS;
+    }
+
+    public static isRebootCommand(message: Message) {
+        return message.content.toLowerCase().startsWith(Commands.REBOOT);
     }
 
     public static isAddGameCommand(message: Message) {
