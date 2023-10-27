@@ -36,9 +36,9 @@ npx tsc && npm start
 ```
 
 ## Startup command for Rasberry Pi or other linux-based server device
-The .env file has to be present in the root folder on the machine we run this on.
+The .env & flyway.conf file has to be present in the root folder on the machine we run this on.
 ```
-rm -r -f atlas/ && git clone https://github.com/thomaskaviani/atlas.git && cp .env atlas/.env && cd atlas && npm start
+rm -r -f atlas/ && git clone https://github.com/thomaskaviani/atlas.git && cp .env atlas/.env && cp flyway.conf atlas/flyway.conf && cd atlas && flyway -configFile=flyway.conf migrate && npm start
 ```
 
 ## Flyway CLI 
