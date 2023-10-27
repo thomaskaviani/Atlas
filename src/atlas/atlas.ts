@@ -73,8 +73,6 @@ export class Atlas {
         LoggingService.log(Logging.ATLAS_LISTENING);
         this.discordClient.on('messageCreate', (message: Message) => {
             if (this.isValidAtlasChannel()) {
-                LoggingService.logDiscordMessage(message);
-                LoggingService.log("*" + message.content + "*");
                 this.handleDiscordMessage(message);
             }
         });
@@ -92,12 +90,14 @@ export class Atlas {
 
     private static handleAtlasCommand(message: Message) {
         if (Commands.isAtlasCommand(message)) {
+            LoggingService.logDiscordMessage(message);
             Messages.replySilent(message, Messages.ATLAS_MESSAGE);
         }
     }
 
     private static handleRebootCommand(message: Message) {
         if (Commands.isRebootCommand(message) && message.author.username == 'thomaskaviani') {
+            LoggingService.logDiscordMessage(message);
             Messages.replySilent(message, Messages.ATLAS_REBOOT_MESSAGE);
             require('child_process').exec('sudo reboot', function (msg) { console.log(msg) });
         }
@@ -105,6 +105,7 @@ export class Atlas {
 
     private async handleRemoveGameCommand(message: Message): Promise<void> {
         if (Commands.isRemoveGameCommand(message) && this.isValidAtlasChannel()) {
+            LoggingService.logDiscordMessage(message);
             const boardgame = message.content.slice(12).toLowerCase();
             if (!boardgame) {
                 Messages.replySilent(message, Messages.REMOVE_GAME_INCOMPLETE_COMMAND);
@@ -122,6 +123,7 @@ export class Atlas {
 
     private async handleAddGameCommand(message: Message): Promise<void> {
         if (Commands.isAddGameCommand(message) && this.isValidAtlasChannel()) {
+            LoggingService.logDiscordMessage(message);
             const gameString = message.content.slice(9).toLowerCase();
             if (!gameString) {
                 Messages.replySilent(message, Messages.ADD_GAME_INCOMPLETE_COMMAND);
@@ -147,6 +149,7 @@ export class Atlas {
 
     private async handleOwnerCommand(message: Message) {
         if (Commands.isOwnersCommand(message)) {
+            LoggingService.logDiscordMessage(message);
             const boardgame = message.content.slice(8).toLowerCase();
             if (!boardgame) {
                 Messages.replySilent(message, Messages.GAMES_INCOMPLETE_COMMAND);
@@ -169,6 +172,7 @@ export class Atlas {
 
     private async handleGamesCommand(message: Message) {
         if (Commands.isGamesCommand(message)) {
+            LoggingService.logDiscordMessage(message);
             const ownerString = message.content.slice(7);
             if (!ownerString) {
                 Messages.replySilent(message, Messages.OWNER_INCOMPLETE_COMMAND);
