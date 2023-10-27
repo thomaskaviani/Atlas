@@ -98,7 +98,8 @@ export class Atlas {
 
     private static handleRebootCommand(message: Message) {
         if (Commands.isRebootCommand(message) && message.author.username == 'thomaskaviani') {
-            //TODO to implement remote reboot
+            Messages.replySilent(message, Messages.ATLAS_REBOOT_MESSAGE);
+            require('child_process').exec('sudo reboot', function (msg) { console.log(msg) });
         }
     }
 

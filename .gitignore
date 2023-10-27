@@ -43,3 +43,7 @@ Thumbs.db
 /.env
 /package-lock.json
 
+/src/atlas/atlas.js
+/src/atlas/atlas.js.map
+*.js
+*.js.map
