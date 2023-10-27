@@ -1,3 +1,5 @@
+import {Logging} from "./atlas/logging";
+
 require('dotenv').config();
 import 'reflect-metadata';
 import container from "./inversify.config";
@@ -23,9 +25,9 @@ let sequelize = new Sequelize({
 sequelize
     .authenticate()
     .then(() => {
-        LoggingService.log("Connected with Database");
-        bot.run();
+        LoggingService.log(Logging.ATLAS_CONNECTED_DB);
+        void bot.run();
     })
     .catch((err) => {
-        LoggingService.logWithError("Unable to connect to the Database:", err)
+        LoggingService.logWithError(Logging.ATLAS_CONNECTING_FAILED, err)
     });

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const logging_1 = require("./atlas/logging");
 require('dotenv').config();
 require("reflect-metadata");
 const inversify_config_1 = require("./inversify.config");
@@ -21,10 +22,10 @@ let sequelize = new sequelize_typescript_1.Sequelize({
 sequelize
     .authenticate()
     .then(() => {
-    logging_service_1.LoggingService.log("Connected with Database");
-    bot.run();
+    logging_service_1.LoggingService.log(logging_1.Logging.ATLAS_CONNECTED_DB);
+    void bot.run();
 })
     .catch((err) => {
-    logging_service_1.LoggingService.logWithError("Unable to connect to the Database:", err);
+    logging_service_1.LoggingService.logWithError(logging_1.Logging.ATLAS_CONNECTING_FAILED, err);
 });
 //# sourceMappingURL=index.js.map

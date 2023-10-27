@@ -11,18 +11,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var Atlas_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Atlas = void 0;
 require("reflect-metadata");
 const inversify_1 = require("inversify");
-const types_1 = require("./../types");
+const types_1 = require("../types");
 const logging_service_1 = require("../services/logging-service");
 const discord_js_1 = require("discord.js");
 const commands_1 = require("./commands");
 const messages_1 = require("./messages");
 const game_service_1 = require("../services/game-service");
 const collection_line_1 = require("../domain/collection-line");
-let Atlas = exports.Atlas = class Atlas {
+const logging_1 = require("./logging");
+let Atlas = exports.Atlas = Atlas_1 = class Atlas {
     constructor(client, token, channelId, dbHost, dbUser, dbPassword, dbPort, dbName, gameService) {
         this.discordClient = client;
         this.token = token;
@@ -43,103 +45,104 @@ let Atlas = exports.Atlas = class Atlas {
     initializeAtlas() {
         this.discordClient.on('ready', () => {
             this.retrieveAtlasChannel();
-            logging_service_1.LoggingService.log('Atlas initialized');
+            logging_service_1.LoggingService.log(logging_1.Logging.ATLAS_INITIALIZED);
         });
     }
     retrieveAtlasChannel() {
         this.discordClient.channels.fetch(this.atlasChannelId).then((channel) => {
-            logging_service_1.LoggingService.log('atlasChannel found');
+            logging_service_1.LoggingService.log(logging_1.Logging.ATLAS_CHANNEL_FOUND);
             this.atlasChannel = channel;
             this.updateAtlasMessage();
         });
     }
     listen() {
-        logging_service_1.LoggingService.log('Listening to messages');
+        logging_service_1.LoggingService.log(logging_1.Logging.ATLAS_LISTENING);
         this.discordClient.on('messageCreate', (message) => {
-            if (this.isValidAtlasChannel())
+            if (this.isValidAtlasChannel()) {
                 logging_service_1.LoggingService.logDiscordMessage(message);
-            logging_service_1.LoggingService.log("*" + message.content + "*");
-            this.handleDiscordMessage(message);
+                logging_service_1.LoggingService.log("*" + message.content + "*");
+                this.handleDiscordMessage(message);
+            }
         });
     }
     handleDiscordMessage(message) {
-        this.handleAtlasCommand(message);
-        this.handleAddGameCommand(message);
-        this.handleRemoveGameCommand(message);
-        this.handleOwnerCommand(message);
-        this.handleGamesCommand(message);
+        Atlas_1.handleAtlasCommand(message);
+        void this.handleAddGameCommand(message);
+        void this.handleRemoveGameCommand(message);
+        void this.handleOwnerCommand(message);
+        void this.handleGamesCommand(message);
     }
-    handleAtlasCommand(message) {
-        if (this.isAtlasCommand(message)) {
+    static handleAtlasCommand(message) {
+        if (commands_1.Commands.isAtlasCommand(message)) {
             messages_1.Messages.replySilent(message, messages_1.Messages.ATLAS_MESSAGE);
         }
     }
     async handleRemoveGameCommand(message) {
-        if (this.isRemoveGameCommand(message) && this.isValidAtlasChannel()) {
-            const gameString = message.content.slice(12).toLowerCase();
-            if (!gameString) {
+        if (commands_1.Commands.isRemoveGameCommand(message) && this.isValidAtlasChannel()) {
+            const boardgame = message.content.slice(12).toLowerCase();
+            if (!boardgame) {
                 messages_1.Messages.replySilent(message, messages_1.Messages.REMOVE_GAME_INCOMPLETE_COMMAND);
                 return;
             }
-            if (await this.doesOwnerHaveGame(gameString, message.author.username)) {
-                this.gameService.deleteCollectionLine(gameString, message.author.username);
+            if (await this.gameService.doesOwnerHaveGame(boardgame, message.author.username)) {
+                this.gameService.deleteCollectionLine(boardgame, message.author.username);
                 this.updateAtlasMessage();
-                messages_1.Messages.replySilent(message, messages_1.Messages.REMOVED_FROM_GAME + gameString);
+                messages_1.Messages.replySilent(message, messages_1.Messages.REMOVED_FROM_GAME + boardgame);
             }
             else {
-                messages_1.Messages.replySilent(message, messages_1.Messages.DONT_OWN_GAME_MESSAGE + gameString);
+                messages_1.Messages.replySilent(message, messages_1.Messages.DONT_OWN_GAME_MESSAGE + boardgame);
             }
         }
     }
     async handleAddGameCommand(message) {
-        if (this.isAddGameCommand(message) && this.isValidAtlasChannel()) {
+        if (commands_1.Commands.isAddGameCommand(message) && this.isValidAtlasChannel()) {
             const gameString = message.content.slice(9).toLowerCase();
             if (!gameString) {
                 messages_1.Messages.replySilent(message, messages_1.Messages.ADD_GAME_INCOMPLETE_COMMAND);
                 return;
             }
-            if (!await this.doesOwnerExists(message.author.username)) {
-                this.gameService.saveOwner(message.author.username);
+            if (!await this.gameService.doesOwnerExists(message.author.username)) {
+                await this.gameService.saveOwner(message.author.username);
             }
-            if (!await this.doesBoardGameExists(gameString)) {
+            if (!await this.gameService.doesBoardGameExists(gameString)) {
                 messages_1.Messages.replySilent(message, messages_1.Messages.GAME_DOES_NOT_EXIST_ADD_NOW_MESSAGE);
-                this.gameService.saveBoardGame(gameString, 0);
+                await this.gameService.saveBoardGame(gameString, 0);
             }
-            if (!await this.doesOwnerHaveGame(gameString, message.author.username)) {
+            if (!await this.gameService.doesOwnerHaveGame(gameString, message.author.username)) {
                 messages_1.Messages.replySilent(message, messages_1.Messages.GAME_ADD_OWNER_MESSAGE + gameString);
-                this.gameService.saveCollectionLine(gameString, message.author.username);
+                await this.gameService.saveCollectionLine(gameString, message.author.username);
                 this.updateAtlasMessage();
             }
         }
     }
     async handleOwnerCommand(message) {
-        if (this.isOwnersCommand(message)) {
-            const gameString = message.content.slice(8).toLowerCase();
-            if (!gameString) {
+        if (commands_1.Commands.isOwnersCommand(message)) {
+            const boardgame = message.content.slice(8).toLowerCase();
+            if (!boardgame) {
                 messages_1.Messages.replySilent(message, messages_1.Messages.GAMES_INCOMPLETE_COMMAND);
                 return;
             }
-            if (!await this.doesBoardGameExists(gameString)) {
-                messages_1.Messages.replySilent(message, messages_1.Messages.GAME_DOES_NOT_EXIST_MESSAGE);
+            if (!await this.gameService.doesBoardGameExists(boardgame)) {
+                messages_1.Messages.replySilent(message, messages_1.Messages.bold(boardgame) + messages_1.Messages.GAME_DOES_NOT_EXIST_MESSAGE);
             }
             else {
-                let collectionLinesForBoardGame = await this.gameService.retrieveLinesForBoardGame(gameString);
+                let collectionLinesForBoardGame = await this.gameService.retrieveLinesForBoardGame(boardgame);
                 let ownerString = '';
-                for (let ownerOfBoardgame of collection_line_1.default.getOwners(collectionLinesForBoardGame)) {
-                    ownerString = ownerString + ownerOfBoardgame + "\n";
+                for (let owner of collection_line_1.default.getOwners(collectionLinesForBoardGame)) {
+                    ownerString = ownerString + owner + "\n";
                 }
-                messages_1.Messages.replySilent(message, messages_1.Messages.bold(messages_1.Messages.capitalize(gameString)) + messages_1.Messages.HAS_FOLLOWING_OWNERS + ownerString);
+                messages_1.Messages.replySilent(message, messages_1.Messages.bold(messages_1.Messages.capitalize(boardgame)) + messages_1.Messages.HAS_FOLLOWING_OWNERS + ownerString);
             }
         }
     }
     async handleGamesCommand(message) {
-        if (this.isGamesCommand(message)) {
+        if (commands_1.Commands.isGamesCommand(message)) {
             const ownerString = message.content.slice(7);
             if (!ownerString) {
                 messages_1.Messages.replySilent(message, messages_1.Messages.OWNER_INCOMPLETE_COMMAND);
                 return;
             }
-            if (!await this.doesOwnerExists(ownerString)) {
+            if (!await this.gameService.doesOwnerExists(ownerString)) {
                 messages_1.Messages.replySilent(message, messages_1.Messages.USER_NOT_AN_OWNER_MESSAGE);
             }
             else {
@@ -154,42 +157,15 @@ let Atlas = exports.Atlas = class Atlas {
     }
     updateAtlasMessage() {
         this.atlasChannel.messages.fetch().then(async (messages) => {
-            messages.first()?.delete();
+            await messages.first()?.delete();
             const atlasMessage = await this.generateAtlasMessage();
             if (atlasMessage.length != 0) {
-                this.atlasChannel.send(atlasMessage);
+                await this.atlasChannel.send(atlasMessage);
             }
         });
     }
-    async doesOwnerExists(username) {
-        const owner = await this.gameService.retrieveOwner(username);
-        return owner != undefined && owner != null;
-    }
-    async doesBoardGameExists(name) {
-        const boardgame = await this.gameService.retrieveBoardGame(name);
-        return boardgame != undefined && boardgame != null;
-    }
-    async doesOwnerHaveGame(gameString, username) {
-        const collectionLines = await this.gameService.retrieveLinesForOwnerAndBoardGame(username, gameString);
-        return collectionLines.length > 0;
-    }
-    isAtlasCommand(message) {
-        return message.content.toLowerCase() == commands_1.Commands.ATLAS;
-    }
-    isAddGameCommand(message) {
-        return message.content.toLowerCase().startsWith(commands_1.Commands.ADD_GAME) && message.content.slice(8).startsWith(' ');
-    }
-    isOwnersCommand(message) {
-        return message.content.toLowerCase().startsWith(commands_1.Commands.OWNER) && message.content.slice(7).startsWith(' ');
-    }
-    isGamesCommand(message) {
-        return message.content.toLowerCase().startsWith(commands_1.Commands.GAMES) && message.content.slice(6).startsWith(' ');
-    }
-    isRemoveGameCommand(message) {
-        return message.content.toLowerCase().startsWith(commands_1.Commands.REMOVE_GAME) && message.content.slice(11).startsWith(' ');
-    }
     isValidAtlasChannel() {
-        return this.atlasChannel.messages != undefined && this.atlasChannel.messages != null;
+        return this.atlasChannel.messages != null;
     }
     async generateAtlasMessage() {
         let boardgameMap = new Map();
@@ -200,7 +176,9 @@ let Atlas = exports.Atlas = class Atlas {
             for (let collectionLine of collectionLinesForGame) {
                 owners.push(collectionLine.ownerUserName);
             }
-            boardgameMap.set(messages_1.Messages.capitalize(boardgame.name), owners);
+            if (owners.length > 0) {
+                boardgameMap.set(messages_1.Messages.capitalize(boardgame.name), owners);
+            }
         }
         return '# The Collection 🎲🏰🧙‍♂️\n\n'
             + 'This is a collection of all the boardgames I know of. Feel free to add games by using A.T.L.A.S in other channels with the proper commands.\n'
@@ -208,7 +186,7 @@ let Atlas = exports.Atlas = class Atlas {
             + messages_1.Messages.getBoardgameBoxes(boardgameMap) + "\n\n";
     }
 };
-exports.Atlas = Atlas = __decorate([
+exports.Atlas = Atlas = Atlas_1 = __decorate([
     (0, inversify_1.injectable)(),
     __param(0, (0, inversify_1.inject)(types_1.TYPES.Client)),
     __param(1, (0, inversify_1.inject)(types_1.TYPES.Token)),

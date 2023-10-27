@@ -1,108 +1,145 @@
-import { injectable } from "inversify";
+import {injectable} from "inversify";
 import BoardGame from "../domain/boardgame";
 import CollectionLine from "../domain/collection-line";
 import Owner from "../domain/owner";
-import { Op } from "sequelize";
+import {Op} from "sequelize";
+import {LoggingService} from "./logging-service";
+import {Logging} from "../atlas/logging";
 
 @injectable()
 export class GameService {
 
-  async saveBoardGame(name: string, players: number): Promise<BoardGame> { 
-    try {
-      return await BoardGame.create({
-        name: name,
-        players: players,
-      });
-    } catch (err) {
-      throw new Error("Failed to create boardgame");
-    }
-  }
+    async saveBoardGame(boardgame: string, players: number): Promise<BoardGame> {
+        try {
+            LoggingService.logWithBoardgame(Logging.BOARDGAME_SAVING, boardgame);
 
-  async saveOwner(username: string): Promise<Owner> { 
-      try {
-          return await Owner.create({
-            username: username
-          });
+            return await BoardGame.create({
+                name: boardgame,
+                players: players,
+            });
         } catch (err) {
-          throw new Error("Failed to create owner");
+            LoggingService.logWithBoardgame(Logging.BOARDGAME_SAVED_FAILED, boardgame);
+            throw new Error();
         }
-  }
+    }
 
-  async saveCollectionLine(name: string, username: string): Promise<CollectionLine> { 
-      try {
-          return await CollectionLine.create({
-            boardGameName: name,
-            ownerUserName: username
-          });
+    async saveOwner(owner: string): Promise<Owner> {
+        try {
+            LoggingService.logWithOwner(Logging.OWNER_SAVING, owner);
+
+            return await Owner.create({
+                username: owner
+            });
         } catch (err) {
-          throw new Error("Failed to create collectionline");
+            LoggingService.logWithOwner(Logging.OWNER_SAVED_FAILED, owner);
+            throw new Error();
         }
-  }
-
-  deleteCollectionLine(name: string, username: string) {
-    this.retrieveLinesForOwnerAndBoardGame(username, name).then((collectionLines: CollectionLine[]) => {
-      collectionLines.forEach(collectionLine => {
-        collectionLine.destroy();
-      });
-    });
-  }
-
-  async retrieveOwner(username: string): Promise<Owner | null> {
-    try {
-      return await Owner.findByPk(username);
-    } catch (error) {
-      throw new Error("Failed to retrieve owner");
     }
-  }
 
-  async retrieveBoardGame(name: string): Promise<BoardGame | null> {
-    try {
-      return await BoardGame.findByPk(name);
-    } catch (error) {
-      throw new Error("Failed to retrieve boardgame");
+    async saveCollectionLine(boardgame: string, owner: string): Promise<CollectionLine> {
+        try {
+            LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_CREATED_FAILED, boardgame, owner);
+            return await CollectionLine.create({
+                boardGameName: boardgame,
+                ownerUserName: owner
+            });
+        } catch (err) {
+            LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_CREATED_FAILED, boardgame, owner);
+            throw new Error();
+        }
     }
-  }
 
-  async retrieveAllBoardGames(): Promise<BoardGame[] | null> {
-    try {
-      return await BoardGame.findAll();
-    } catch (error) {
-      throw new Error("Failed to retrieve boardgames");
+    deleteCollectionLine(boardgame: string, owner: string) {
+        this.retrieveLinesForOwnerAndBoardGame(owner, boardgame).then((collectionLines: CollectionLine[]) => {
+            collectionLines.forEach(collectionLine => {
+                collectionLine.destroy().then(x => LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_DELETED, boardgame, owner));
+            });
+        });
     }
-  }
 
-  async retrieveLinesForOwnerAndBoardGame(username: string, boardgame: string): Promise<CollectionLine[]|null> {
-      try {
-          let condition: any = {};
-          condition.boardGameName = { [Op.eq]: boardgame };
-          condition.ownerUserName = { [Op.eq]: username };
+    async retrieveOwner(owner: string): Promise<Owner | null> {
+        try {
+            LoggingService.logWithOwner(Logging.OWNER_RETRIEVING, owner);
 
-          return await CollectionLine.findAll({ where: condition });
+            return await Owner.findByPk(owner);
         } catch (error) {
-          throw new Error("Failed to retrieve collectionlines");
+            LoggingService.logWithOwner(Logging.OWNER_RETRIEVAL_FAILED, owner);
+            throw new Error();
         }
-  }
+    }
 
-  async retrieveLinesForBoardGame(boardgame: string): Promise<CollectionLine[]|null> {
-    try {
-        let condition: any = {};
-        condition.boardGameName = { [Op.eq]: boardgame };
+    async retrieveBoardGame(boardgame: string): Promise<BoardGame | null> {
+        try {
+            LoggingService.logWithBoardgame(Logging.BOARDGAME_RETRIEVING, boardgame);
+            return await BoardGame.findByPk(boardgame);
+        } catch (error) {
+            LoggingService.logWithBoardgame(Logging.BOARDGAME_RETRIEVAL_FAILED, boardgame);
+            throw new Error();
+        }
+    }
 
-        return await CollectionLine.findAll({ where: condition });
-      } catch (error) {
-        throw new Error("Failed to retrieve collectionlines");
-      }
-  }
+    async retrieveAllBoardGames(): Promise<BoardGame[] | null> {
+        try {
+            LoggingService.log(Logging.BOARDGAME_RETRIEVING);
+            return await BoardGame.findAll();
+        } catch (error) {
+            LoggingService.log(Logging.BOARDGAME_RETRIEVAL_FAILED);
+            throw new Error();
+        }
+    }
 
-  async retrieveLinesForOwner(username: string): Promise<CollectionLine[]|null> {
-    try {
-        let condition: any = {};
-        condition.ownerUserName = { [Op.eq]: username };
+    async retrieveLinesForOwnerAndBoardGame(boardgame: string, owner: string): Promise<CollectionLine[] | null> {
+        try {
+            LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_RETRIEVING, boardgame, owner);
+            let condition: any = {};
+            condition.boardGameName = {[Op.eq]: boardgame};
+            condition.ownerUserName = {[Op.eq]: owner};
 
-        return await CollectionLine.findAll({ where: condition });
-      } catch (error) {
-        throw new Error("Failed to retrieve collectionlines");
-      }
-  }
+            return await CollectionLine.findAll({where: condition});
+        } catch (error) {
+            LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_RETRIEVAL_FAILED, boardgame, owner);
+            throw new Error();
+        }
+    }
 
+    async retrieveLinesForBoardGame(boardgame: string): Promise<CollectionLine[] | null> {
+        try {
+            LoggingService.logWithBoardgame(Logging.COLLECTION_LINE_RETRIEVING, boardgame);
+            let condition: any = {};
+            condition.boardGameName = {[Op.eq]: boardgame};
+
+            return await CollectionLine.findAll({where: condition});
+        } catch (error) {
+            LoggingService.logWithBoardgame(Logging.COLLECTION_LINE_RETRIEVAL_FAILED, boardgame);
+            throw new Error();
+        }
+    }
+
+    async retrieveLinesForOwner(owner: string): Promise<CollectionLine[] | null> {
+        try {
+            LoggingService.logWithOwner(Logging.COLLECTION_LINE_RETRIEVING, owner);
+            let condition: any = {};
+            condition.ownerUserName = {[Op.eq]: owner};
+
+            return await CollectionLine.findAll({where: condition});
+        } catch (error) {
+            LoggingService.logWithOwner(Logging.COLLECTION_LINE_RETRIEVAL_FAILED, owner);
+            throw new Error();
+        }
+    }
+
+    public async doesOwnerExists(username: string) {
+        const owner: Owner = await this.retrieveOwner(username);
+        return owner != undefined;
+    }
+
+    public async doesBoardGameExists(name: string) {
+        const boardgame: BoardGame = await this.retrieveBoardGame(name);
+        return boardgame != undefined;
+    }
+
+    public async doesOwnerHaveGame(boardgame: string, owner: string): Promise<boolean> {
+        const collectionLines: CollectionLine[] = await this.retrieveLinesForOwnerAndBoardGame(boardgame, owner);
+        return collectionLines.length > 0;
+    }
 }

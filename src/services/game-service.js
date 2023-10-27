@@ -12,100 +12,132 @@ const boardgame_1 = require("../domain/boardgame");
 const collection_line_1 = require("../domain/collection-line");
 const owner_1 = require("../domain/owner");
 const sequelize_1 = require("sequelize");
+const logging_service_1 = require("./logging-service");
+const logging_1 = require("../atlas/logging");
 let GameService = exports.GameService = class GameService {
-    async saveBoardGame(name, players) {
+    async saveBoardGame(boardgame, players) {
         try {
+            logging_service_1.LoggingService.logWithBoardgame(logging_1.Logging.BOARDGAME_SAVING, boardgame);
             return await boardgame_1.default.create({
-                name: name,
+                name: boardgame,
                 players: players,
             });
         }
         catch (err) {
-            throw new Error("Failed to create boardgame");
+            logging_service_1.LoggingService.logWithBoardgame(logging_1.Logging.BOARDGAME_SAVED_FAILED, boardgame);
+            throw new Error();
         }
     }
-    async saveOwner(username) {
+    async saveOwner(owner) {
         try {
+            logging_service_1.LoggingService.logWithOwner(logging_1.Logging.OWNER_SAVING, owner);
             return await owner_1.default.create({
-                username: username
+                username: owner
             });
         }
         catch (err) {
-            throw new Error("Failed to create owner");
+            logging_service_1.LoggingService.logWithOwner(logging_1.Logging.OWNER_SAVED_FAILED, owner);
+            throw new Error();
         }
     }
-    async saveCollectionLine(name, username) {
+    async saveCollectionLine(boardgame, owner) {
         try {
+            logging_service_1.LoggingService.logWithBoardgameAndOwner(logging_1.Logging.COLLECTION_LINE_CREATED_FAILED, boardgame, owner);
             return await collection_line_1.default.create({
-                boardGameName: name,
-                ownerUserName: username
+                boardGameName: boardgame,
+                ownerUserName: owner
             });
         }
         catch (err) {
-            throw new Error("Failed to create collectionline");
+            logging_service_1.LoggingService.logWithBoardgameAndOwner(logging_1.Logging.COLLECTION_LINE_CREATED_FAILED, boardgame, owner);
+            throw new Error();
         }
     }
-    deleteCollectionLine(name, username) {
-        this.retrieveLinesForOwnerAndBoardGame(username, name).then((collectionLines) => {
+    deleteCollectionLine(boardgame, owner) {
+        this.retrieveLinesForOwnerAndBoardGame(owner, boardgame).then((collectionLines) => {
             collectionLines.forEach(collectionLine => {
-                collectionLine.destroy();
+                collectionLine.destroy().then(x => logging_service_1.LoggingService.logWithBoardgameAndOwner(logging_1.Logging.COLLECTION_LINE_DELETED, boardgame, owner));
             });
         });
     }
-    async retrieveOwner(username) {
+    async retrieveOwner(owner) {
         try {
-            return await owner_1.default.findByPk(username);
+            logging_service_1.LoggingService.logWithOwner(logging_1.Logging.OWNER_RETRIEVING, owner);
+            return await owner_1.default.findByPk(owner);
         }
         catch (error) {
-            throw new Error("Failed to retrieve owner");
+            logging_service_1.LoggingService.logWithOwner(logging_1.Logging.OWNER_RETRIEVAL_FAILED, owner);
+            throw new Error();
         }
     }
-    async retrieveBoardGame(name) {
+    async retrieveBoardGame(boardgame) {
         try {
-            return await boardgame_1.default.findByPk(name);
+            logging_service_1.LoggingService.logWithBoardgame(logging_1.Logging.BOARDGAME_RETRIEVING, boardgame);
+            return await boardgame_1.default.findByPk(boardgame);
         }
         catch (error) {
-            throw new Error("Failed to retrieve boardgame");
+            logging_service_1.LoggingService.logWithBoardgame(logging_1.Logging.BOARDGAME_RETRIEVAL_FAILED, boardgame);
+            throw new Error();
         }
     }
     async retrieveAllBoardGames() {
         try {
+            logging_service_1.LoggingService.log(logging_1.Logging.BOARDGAME_RETRIEVING);
             return await boardgame_1.default.findAll();
         }
         catch (error) {
-            throw new Error("Failed to retrieve boardgames");
+            logging_service_1.LoggingService.log(logging_1.Logging.BOARDGAME_RETRIEVAL_FAILED);
+            throw new Error();
         }
     }
-    async retrieveLinesForOwnerAndBoardGame(username, boardgame) {
+    async retrieveLinesForOwnerAndBoardGame(boardgame, owner) {
         try {
+            logging_service_1.LoggingService.logWithBoardgameAndOwner(logging_1.Logging.COLLECTION_LINE_RETRIEVING, boardgame, owner);
             let condition = {};
             condition.boardGameName = { [sequelize_1.Op.eq]: boardgame };
-            condition.ownerUserName = { [sequelize_1.Op.eq]: username };
+            condition.ownerUserName = { [sequelize_1.Op.eq]: owner };
             return await collection_line_1.default.findAll({ where: condition });
         }
         catch (error) {
-            throw new Error("Failed to retrieve collectionlines");
+            logging_service_1.LoggingService.logWithBoardgameAndOwner(logging_1.Logging.COLLECTION_LINE_RETRIEVAL_FAILED, boardgame, owner);
+            throw new Error();
         }
     }
     async retrieveLinesForBoardGame(boardgame) {
         try {
+            logging_service_1.LoggingService.logWithBoardgame(logging_1.Logging.COLLECTION_LINE_RETRIEVING, boardgame);
             let condition = {};
             condition.boardGameName = { [sequelize_1.Op.eq]: boardgame };
             return await collection_line_1.default.findAll({ where: condition });
         }
         catch (error) {
-            throw new Error("Failed to retrieve collectionlines");
+            logging_service_1.LoggingService.logWithBoardgame(logging_1.Logging.COLLECTION_LINE_RETRIEVAL_FAILED, boardgame);
+            throw new Error();
         }
     }
-    async retrieveLinesForOwner(username) {
+    async retrieveLinesForOwner(owner) {
         try {
+            logging_service_1.LoggingService.logWithOwner(logging_1.Logging.COLLECTION_LINE_RETRIEVING, owner);
             let condition = {};
-            condition.ownerUserName = { [sequelize_1.Op.eq]: username };
+            condition.ownerUserName = { [sequelize_1.Op.eq]: owner };
             return await collection_line_1.default.findAll({ where: condition });
         }
         catch (error) {
-            throw new Error("Failed to retrieve collectionlines");
+            logging_service_1.LoggingService.logWithOwner(logging_1.Logging.COLLECTION_LINE_RETRIEVAL_FAILED, owner);
+            throw new Error();
         }
+    }
+    async doesOwnerExists(username) {
+        const owner = await this.retrieveOwner(username);
+        return owner != undefined;
+    }
+    async doesBoardGameExists(name) {
+        const boardgame = await this.retrieveBoardGame(name);
+        return boardgame != undefined;
+    }
+    async doesOwnerHaveGame(boardgame, owner) {
+        const collectionLines = await this.retrieveLinesForOwnerAndBoardGame(boardgame, owner);
+        return collectionLines.length > 0;
     }
 };
 exports.GameService = GameService = __decorate([

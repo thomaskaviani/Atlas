@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Messages = void 0;
 class Messages {
     static replySilent(message, messageContent) {
-        message.reply({ content: messageContent, flags: [4096] });
+        void message.reply({ content: messageContent, flags: [4096] });
     }
     static capitalize(message) {
         return message.replace(/(?:^|\s|["'([{])+\S/g, match => match.toUpperCase());
@@ -49,8 +49,8 @@ Messages.ATLAS_MESSAGE = "Hi, I'm ready to collect some boardgames 🎲🏰🧙�
     + "**!owners Monopoly**\n\n"
     + "*Showing the games a certain user owns can be done with the following command*\n"
     + "**!games Atlas**";
-Messages.GAME_DOES_NOT_EXIST_ADD_NOW_MESSAGE = "I don't know this game yet, thank you for expanding our collection";
-Messages.GAME_DOES_NOT_EXIST_MESSAGE = "This game is not present in our collection";
+Messages.GAME_DOES_NOT_EXIST_ADD_NOW_MESSAGE = "I don't know this game yet, thank you for expanding my collection";
+Messages.GAME_DOES_NOT_EXIST_MESSAGE = " is not present in my collection";
 Messages.USER_NOT_AN_OWNER_MESSAGE = "This user is not an owner of any boardgames";
 Messages.GAME_ADD_OWNER_MESSAGE = "I'm adding you as an owner of ";
 Messages.HAS_FOLLOWING_OWNERS = " has the following owners:\n\n";
