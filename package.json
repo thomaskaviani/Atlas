@@ -4,7 +4,8 @@
   "description": "Discord bot for collecting boardgames",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "build" : "npx tsc",
+    "start": "node dist/index.js",
     "flyway-clean-migrate": "flyway -locations=filesystem:opt/migrations -user=postgres -password=password -url=jdbc:postgresql://localhost:5432/postgres -driver=org.postgresql.Driver -cleanDisabled=false clean migrate",
     "flyway-migrate": "flyway -locations=filesystem:opt/migrations -user=postgres -password=password -url=jdbc:postgresql://localhost:5432/postgres -driver=org.postgresql.Driver -cleanDisabled=false migrate" 
   },

@@ -18,6 +18,7 @@ let sequelize = new Sequelize({
     username: bot.dbUser,
     password: bot.dbPassword,
     host: bot.dbHost,
+    logging: false,
     dialect: "postgres",
     models: [BoardGame, Owner, CollectionLine]
 });
