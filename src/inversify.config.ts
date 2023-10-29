@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import {Container} from "inversify";
 import {TYPES} from "./types";
-import {Atlas} from "./atlas/atlas";
+import {Atlas} from "./atlas";
 import {Client,GatewayIntentBits} from "discord.js";
 import { GameService } from "./services/game-service";
 

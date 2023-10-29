@@ -14,7 +14,7 @@ export class Logging {
     public static readonly OWNER_RETRIEVAL_FAILED = 'Owners failed to retrieve';
     public static readonly OWNER_SAVING = 'Owners saving';
     public static readonly OWNER_SAVED_FAILED = 'Owners failed to save';
-
+    
     //atlas logs
     public static readonly ATLAS_INITIALIZED = 'A.T.L.A.S. INITIALIZED';
     public static readonly ATLAS_CONNECTED_DB = 'A.T.L.A.S. CONNECTED TO DATABASE';

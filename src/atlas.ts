@@ -1,14 +1,16 @@
 import 'reflect-metadata';
 import {inject, injectable} from "inversify";
-import {TYPES} from "../types"
-import {LoggingService} from '../services/logging-service';
+import {TYPES} from "./types"
+import {LoggingService} from './services/logging-service';
 import {Client, Message, TextChannel} from "discord.js";
-import {Commands} from './commands';
-import {Messages} from './messages';
-import {GameService} from '../services/game-service';
-import BoardGame from '../domain/boardgame';
-import CollectionLine from '../domain/collection-line';
-import {Logging} from "./logging";
+import {CommandsMessages} from './atlas/commands-messages';
+import {Messages} from './atlas/messages';
+import {GameService} from './services/game-service';
+import BoardGame from './domain/boardgame';
+import CollectionLine from './domain/collection-line';
+import {Logging} from "./atlas/logging";
+import {Commands} from './commands/Commands';
+import interactionCreateListener from './listeners/SlashCommandListener';
 
 @injectable()
 export class Atlas {
@@ -50,13 +52,16 @@ export class Atlas {
         this.initializeAtlas();
         this.listen();
 
+        interactionCreateListener(this.discordClient);
         return this.discordClient.login(this.token);
     }
 
     //Private methods
     private initializeAtlas(): void {
-        this.discordClient.on('ready', () => {
+        this.discordClient.on('ready', async () => {
             this.retrieveAtlasChannel();
+            await this.discordClient.application.commands.set(Commands);
+            await this.discordClient.application.commands.set(Commands);  
             LoggingService.log(Logging.ATLAS_INITIALIZED);
         });
     }
@@ -65,7 +70,7 @@ export class Atlas {
         this.discordClient.channels.fetch(this.atlasChannelId).then((channel: TextChannel) => {
             LoggingService.log(Logging.ATLAS_CHANNEL_FOUND);
             this.atlasChannel = channel;
-            this.updateAtlasMessage();
+            //this.updateAtlasMessage();
         });
     }
 
@@ -89,14 +94,14 @@ export class Atlas {
     }
 
     private static handleAtlasCommand(message: Message) {
-        if (Commands.isAtlasCommand(message)) {
+        if (CommandsMessages.isAtlasCommand(message)) {
             LoggingService.logDiscordMessage(message);
             Messages.replySilent(message, Messages.ATLAS_MESSAGE);
         }
     }
 
     private static handleRebootCommand(message: Message) {
-        if (Commands.isRebootCommand(message) && message.author.username == 'thomaskaviani') {
+        if (CommandsMessages.isRebootCommand(message) && message.author.username == 'thomaskaviani') {
             LoggingService.logDiscordMessage(message);
             Messages.replySilent(message, Messages.ATLAS_REBOOT_MESSAGE);
             require('child_process').exec('sudo reboot', function (msg) { console.log(msg) });
@@ -104,7 +109,7 @@ export class Atlas {
     }
 
     private async handleRemoveGameCommand(message: Message): Promise<void> {
-        if (Commands.isRemoveGameCommand(message) && this.isValidAtlasChannel()) {
+        if (CommandsMessages.isRemoveGameCommand(message) && this.isValidAtlasChannel()) {
             LoggingService.logDiscordMessage(message);
             const boardgame = message.content.slice(12).toLowerCase();
             if (!boardgame) {
@@ -122,7 +127,7 @@ export class Atlas {
     }
 
     private async handleAddGameCommand(message: Message): Promise<void> {
-        if (Commands.isAddGameCommand(message) && this.isValidAtlasChannel()) {
+        if (CommandsMessages.isAddGameCommand(message) && this.isValidAtlasChannel()) {
             LoggingService.logDiscordMessage(message);
             const gameString = message.content.slice(9).toLowerCase();
             if (!gameString) {
@@ -148,7 +153,7 @@ export class Atlas {
     }
 
     private async handleOwnerCommand(message: Message) {
-        if (Commands.isOwnersCommand(message)) {
+        if (CommandsMessages.isOwnersCommand(message)) {
             LoggingService.logDiscordMessage(message);
             const boardgame = message.content.slice(8).toLowerCase();
             if (!boardgame) {
@@ -171,7 +176,7 @@ export class Atlas {
     }
 
     private async handleGamesCommand(message: Message) {
-        if (Commands.isGamesCommand(message)) {
+        if (CommandsMessages.isGamesCommand(message)) {
             LoggingService.logDiscordMessage(message);
             const ownerString = message.content.slice(7);
             if (!ownerString) {

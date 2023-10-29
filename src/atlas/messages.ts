@@ -12,7 +12,8 @@ export class Messages {
         + "*Showing the games a certain user owns can be done with the following command*\n"
         + "**!games Atlas**";
 
-    public static readonly ATLAS_REBOOT_MESSAGE = "☢ SHUTTING DOWN ☢"
+    public static readonly ATLAS_REBOOT_MESSAGE = "☢ SHUTTING DOWN ☢";
+    public static readonly ATLAS_NOT_ALLOWED = "You are not allowed to do this";
     public static readonly GAME_DOES_NOT_EXIST_ADD_NOW_MESSAGE = "I don't know this game yet, thank you for expanding my collection";
     public static readonly GAME_DOES_NOT_EXIST_MESSAGE = " is not present in my collection";
     public static readonly USER_NOT_AN_OWNER_MESSAGE = "This user is not an owner of any boardgames";

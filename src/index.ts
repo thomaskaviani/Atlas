@@ -4,7 +4,7 @@ require('dotenv').config();
 import 'reflect-metadata';
 import container from "./inversify.config";
 import {TYPES} from "./types";
-import {Atlas} from "./atlas/atlas";
+import {Atlas} from "./atlas";
 import BoardGame from './domain/boardgame';
 import { Sequelize } from "sequelize-typescript";
 import Owner from './domain/owner';
