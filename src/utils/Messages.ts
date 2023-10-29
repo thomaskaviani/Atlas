@@ -4,13 +4,13 @@ export class Messages {
     public static readonly ATLAS_MESSAGE = "Hi, I'm ready to collect some boardgames 🎲🏰🧙‍♂️\n\nYou can try one of the following commands to add, remove and view games. "
         + "I'm using Monopoly as a game example and Atlas as a user example:\n\n"
         + "*Adding a game to the collection can be done with the following command*\n"
-        + "**!addgame Monopoly**\n\n"
+        + "**/add-game Monopoly**\n\n"
         + "*Removing you as an owner of a game from the collection can be done with the following command*\n"
-        + "**!removegame Monopoly**\n\n"
+        + "**/remove-game Monopoly**\n\n"
         + "*Showing the owners of a certain game can be done with the following command*\n"
-        + "**!owners Monopoly**\n\n"
+        + "**/owners Monopoly**\n\n"
         + "*Showing the games a certain user owns can be done with the following command*\n"
-        + "**!games Atlas**";
+        + "**/games Atlas**";
 
     public static readonly ATLAS_REBOOT_MESSAGE = "☢ SHUTTING DOWN ☢";
     public static readonly ATLAS_NOT_ALLOWED = "You are not allowed to do this";
@@ -21,6 +21,7 @@ export class Messages {
     public static readonly HAS_FOLLOWING_OWNERS = " has the following owners:\n\n";
     public static readonly HAS_FOLLOWING_GAMES = " owns the following games:\n\n";
     public static readonly REMOVED_FROM_GAME = "I removed you as an owner of ";
+    public static readonly ALREADY_OWN_GAME_MESSAGE = "You already own the game ";
     public static readonly DONT_OWN_GAME_MESSAGE = "You don't own the game ";
 
     public static readonly ADD_GAME_INCOMPLETE_COMMAND = "*This command is incomplete, try adding an actual game after the command itself like:*\n\n**!addgame Monopoly**";

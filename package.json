@@ -4,8 +4,8 @@
   "description": "Discord bot for collecting boardgames",
   "main": "src/index.js",
   "scripts": {
-    "build": "npx tsc",
-    "start": "node dist/index.js",
+    "build": "rm -r -f dist && npx tsc",
+    "start": "node dist/Atlas.js",
     "flyway-clean-migrate": "flyway -locations=filesystem:opt/migrations -user=postgres -password=password -url=jdbc:postgresql://localhost:5432/postgres -driver=org.postgresql.Driver -cleanDisabled=false clean migrate",
     "flyway-migrate": "flyway -locations=filesystem:opt/migrations -user=postgres -password=password -url=jdbc:postgresql://localhost:5432/postgres -driver=org.postgresql.Driver -cleanDisabled=false migrate"
   },
@@ -25,10 +25,8 @@
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "inversify": "^6.0.2",
     "path": "^0.12.7",
     "pg": "^8.11.3",
-    "reflect-metadata": "^0.1.13",
     "require-all": "^3.0.0",
     "sequelize": "^6.33.0",
     "sequelize-typescript": "^2.1.5",

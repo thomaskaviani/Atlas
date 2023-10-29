@@ -1,5 +1,5 @@
 import { Model, Table, Column, DataType } from "sequelize-typescript";
-import { Messages } from "../atlas/messages";
+import { Messages } from "../utils/Messages";
 
 @Table({
     tableName: "collection_line",

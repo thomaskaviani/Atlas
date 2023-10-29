@@ -1,5 +1,3 @@
-import {Message} from "discord.js";
-
 export class LoggingService {
 
     public static log(message: string): void {
@@ -8,10 +6,6 @@ export class LoggingService {
 
     public static logWithError(message: string, error: any): void {
         console.log(Date.now() + ":" + message, error);
-    }
-
-    public static logDiscordMessage(message: Message): void {
-        console.log(Date.now() + ":" + 'received message:' + message.content + ' - ' + message.author.username);
     }
 
     public static logWithBoardgameAndOwner(message: string, boardgame: string, owner: string) {
