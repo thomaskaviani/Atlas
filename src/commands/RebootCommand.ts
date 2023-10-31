@@ -7,8 +7,6 @@ export const RebootCommand: Command = {
     description: "Reboots A.T.L.A.S.",
     options: null,
     run: async (client: Client, interaction: ChatInputCommandInteraction) => {
-        let content = ''
-        console.log(interaction.options.get("password").value);
         if (interaction.user.username == "thomaskaviani") {
             const content = Messages.ATLAS_REBOOT_MESSAGE;
             await interaction.followUp({
