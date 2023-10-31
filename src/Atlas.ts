@@ -46,5 +46,4 @@ export class Atlas {
         });
     }
 }
-
-let atlas = new Atlas().run();
+void new Atlas().run();
