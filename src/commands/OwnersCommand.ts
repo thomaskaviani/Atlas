@@ -11,7 +11,8 @@ export const OwnersCommand: AutoCompletableCommand = {
     options: [new SlashCommandStringOption()
         .setName("boardgame")
         .setDescription("Enter the boardgame name")
-        .setRequired(true)],
+        .setRequired(true)
+        .setAutocomplete(true)],
     autocomplete: async (interaction: AutocompleteInteraction) => {
         try {
             const focusedValue = interaction.options.getFocused();
