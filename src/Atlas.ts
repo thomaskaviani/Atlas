@@ -38,8 +38,9 @@ export class Atlas {
     }
 
     private initializeAtlas(): void {
-        LoggingService.initializeLogFile();
         this.discordClient.on('ready', async () => {
+            LoggingService.initializeLogFile();
+
             await AtlasService.deleteCommands();
             await AtlasService.addCommands(this.discordClient);
             await LoggingService.log(Messages.ATLAS_INITIALIZED);
