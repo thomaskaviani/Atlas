@@ -15,7 +15,8 @@ export class Messages {
         + "**/games Atlas**";
 
     //REBOOT COMMAND
-    public static readonly ATLAS_REBOOT_MESSAGE = "☢ SHUTTING DOWN ☢";
+    public static readonly ATLAS_REBOOT_MESSAGE = "☢ Rebooting ☢";
+    public static readonly ATLAS_ONLINE_MESSAGE = "⚡ A.T.L.A.S. Online ⚡";
     public static readonly ATLAS_NOT_ALLOWED = "You are not allowed to do this";
 
     //OWNERS COMMAND

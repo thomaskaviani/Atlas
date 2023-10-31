@@ -12,7 +12,7 @@ export const RebootCommand: Command = {
             if (interaction.user.username == "thomaskaviani") {
                 const content = Messages.ATLAS_REBOOT_MESSAGE;
                 await interaction.reply({
-                    ephemeral: true,
+                    ephemeral: false,
                     content
                 });
                 require('child_process').exec('sudo reboot', function (msg) {

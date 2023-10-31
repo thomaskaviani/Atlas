@@ -5,6 +5,7 @@ import CollectionLine from "./domain/CollectionLine";
 
 export class Config {
     public static readonly ATLAS_CLIENT_ID = "1136339948832825466";
+    public static readonly ATLAS_COMMAND_CHANNEL_ID = "1168163370709565500";
     public static readonly ATLAS_TOKEN = process.env.DISCORD_TOKEN;
     public static readonly ATLAS_COLLECTION_CHANNEL_ID = process.env.DISCORD_HOARD_CHANNEL_ID;
 

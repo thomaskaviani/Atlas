@@ -16,17 +16,6 @@ export class Atlas {
         ]
     });
 
-    public startup(): void {
-        Config.SEQUELIZE.authenticate()
-            .then(() => {
-                LoggingService.log(Messages.ATLAS_CONNECTED_DB);
-                void this.run();
-            })
-            .catch((err) => {
-                LoggingService.logError(err, "database", null);
-            });
-    }
-
     public run() {
         this.initializeAtlas();
 
@@ -44,6 +33,7 @@ export class Atlas {
             await AtlasService.addCommands(this.discordClient);
             await LoggingService.log(Messages.ATLAS_INITIALIZED);
             await AtlasService.updateAtlasMessage(this.discordClient);
+            await AtlasService.atlasOnlineMessage((this.discordClient));
             await LoggingService.log(Messages.ATLAS_CHANNEL_FOUND);
         });
     }

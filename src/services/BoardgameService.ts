@@ -2,11 +2,11 @@ import BoardGame from "../domain/BoardGame";
 import {LoggingService} from "./LoggingService";
 import CollectionLine from "../domain/CollectionLine";
 import {Op} from "sequelize";
-import {ChatInputCommandInteraction} from "discord.js";
+import {Interaction} from "discord.js";
 
 export class BoardgameService {
 
-    public static async retrieveBoardGame(boardgame: string, interaction: ChatInputCommandInteraction): Promise<BoardGame | null> {
+    public static async retrieveBoardGame(boardgame: string, interaction: Interaction): Promise<BoardGame | null> {
         try {
             return await BoardGame.findByPk(boardgame);
         } catch (err) {
@@ -22,7 +22,7 @@ export class BoardgameService {
         }
     }
 
-    public static async retrieveLinesForOwnerAndBoardGame(boardgame: string, interaction: ChatInputCommandInteraction): Promise<CollectionLine[] | null> {
+    public static async retrieveLinesForOwnerAndBoardGame(boardgame: string, interaction: Interaction): Promise<CollectionLine[] | null> {
         try {
             let condition: any = {};
             condition.boardGameName = {[Op.eq]: boardgame};
@@ -34,7 +34,7 @@ export class BoardgameService {
         }
     }
 
-    public static async retrieveLinesForBoardGame(boardgame: string, interaction: ChatInputCommandInteraction): Promise<CollectionLine[] | null> {
+    public static async retrieveLinesForBoardGame(boardgame: string, interaction: Interaction): Promise<CollectionLine[] | null> {
         try {
             let condition: any = {};
             condition.boardGameName = {[Op.eq]: boardgame};
@@ -45,7 +45,7 @@ export class BoardgameService {
         }
     }
 
-    public static async retrieveLinesForOwner(owner: string, interaction: ChatInputCommandInteraction): Promise<CollectionLine[] | null> {
+    public static async retrieveLinesForOwner(owner: string, interaction: Interaction): Promise<CollectionLine[] | null> {
         try {
             let condition: any = {};
             condition.ownerUserName = {[Op.eq]: owner};
@@ -56,7 +56,7 @@ export class BoardgameService {
         }
     }
 
-    public static async saveBoardGame(boardgame: string, players: number, interaction: ChatInputCommandInteraction): Promise<BoardGame> {
+    public static async saveBoardGame(boardgame: string, players: number, interaction: Interaction): Promise<BoardGame> {
         try {
             return await BoardGame.create({
                 name: boardgame,
@@ -67,7 +67,7 @@ export class BoardgameService {
         }
     }
 
-    public static async saveCollectionLine(boardgame: string, interaction: ChatInputCommandInteraction): Promise<CollectionLine> {
+    public static async saveCollectionLine(boardgame: string, interaction: Interaction): Promise<CollectionLine> {
         try {
             return await CollectionLine.create({
                 boardGameName: boardgame,
@@ -78,7 +78,7 @@ export class BoardgameService {
         }
     }
 
-    public static async deleteCollectionLine(boardgame: string, interaction: ChatInputCommandInteraction) {
+    public static async deleteCollectionLine(boardgame: string, interaction: Interaction) {
         try {
             await CollectionLine.destroy({
                 where: {
@@ -91,12 +91,12 @@ export class BoardgameService {
         }
     }
 
-    public static async doesBoardGameExists(name: string, interaction: ChatInputCommandInteraction) {
+    public static async doesBoardGameExists(name: string, interaction: Interaction) {
         const boardgame: BoardGame = await BoardgameService.retrieveBoardGame(name, interaction);
         return boardgame != undefined;
     }
 
-    public static async doesOwnerHaveGame(boardgame: string, interaction: ChatInputCommandInteraction): Promise<boolean> {
+    public static async doesOwnerHaveGame(boardgame: string, interaction: Interaction): Promise<boolean> {
         const collectionLines: CollectionLine[] = await BoardgameService.retrieveLinesForOwnerAndBoardGame(boardgame, interaction);
         return collectionLines.length > 0;
     }

@@ -1,6 +1,7 @@
 import Owner from "../domain/Owner";
 import {LoggingService} from "./LoggingService";
 import {ChatInputCommandInteraction} from "discord.js";
+import BoardGame from "../domain/BoardGame";
 
 export class OwnerService {
 
@@ -9,6 +10,14 @@ export class OwnerService {
             return await Owner.findByPk(interaction.user.username);
         } catch (err) {
             await LoggingService.logError(err, "retrieve-owner", interaction);
+        }
+    }
+
+    public static async retrieveAllOwners(): Promise<Owner[] | null> {
+        try {
+            return await Owner.findAll();
+        } catch (err) {
+            await LoggingService.logError(err, "retrieve-owners", null);
         }
     }
 

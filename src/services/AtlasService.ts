@@ -1,4 +1,4 @@
-import {Client, REST, Routes, TextChannel} from "discord.js";
+import {Client, Message, REST, Routes, TextChannel} from "discord.js";
 import BoardGame from "../domain/BoardGame";
 import CollectionLine from "../domain/CollectionLine";
 import {Messages} from "../utils/Messages";
@@ -27,6 +27,12 @@ export class AtlasService {
                     await channel.send({content: atlasMessage, flags: [4096]});
                 }
             });
+        });
+    }
+
+    public static async atlasOnlineMessage(client: Client): Promise<void> {
+        client.channels.fetch(Config.ATLAS_COMMAND_CHANNEL_ID).then(async (channel: TextChannel) => {
+            await channel.send({content: Messages.ATLAS_ONLINE_MESSAGE, flags: [4096]})
         });
     }
 

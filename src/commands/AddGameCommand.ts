@@ -17,7 +17,6 @@ export const AddGameCommand: AutoCompletableCommand = {
     autocomplete: async (interaction: AutocompleteInteraction) => {
         try {
             const focusedValue = interaction.options.getFocused();
-            console.log(focusedValue);
             const boardgames = (await BoardgameService.retrieveAllBoardGames()).map(x => x.name);
             const filtered = boardgames.filter(choice => choice.startsWith(focusedValue));
             await interaction.respond(
