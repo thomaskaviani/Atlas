@@ -12,7 +12,7 @@ export const GamesCommand: Command = {
         .setDescription("Enter the owner's username")
         .setRequired(true)],
     run: async (client: Client, interaction: ChatInputCommandInteraction) => {
-        let username = interaction.options.get("user").value;
+        let username = interaction.options.get("owner").value;
 
         if (typeof username === "string" && username) {
             let collectionLinesForOwner: CollectionLine[] = await BoardgameService.retrieveLinesForOwner(username);
