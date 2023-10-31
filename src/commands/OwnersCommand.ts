@@ -12,7 +12,7 @@ export const OwnersCommand: Command = {
         .setDescription("Enter the boardgame name")
         .setRequired(true)],
     run: async (client: Client, interaction: ChatInputCommandInteraction) => {
-        let boardgame = interaction.options.get("name").value;
+        let boardgame = interaction.options.get("boardgame").value;
         if (typeof boardgame === "string" && boardgame) {
             boardgame = boardgame.toLowerCase();
             let collectionLinesForBoardGame: CollectionLine[] = await BoardgameService.retrieveLinesForBoardGame(boardgame);
