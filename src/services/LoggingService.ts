@@ -4,12 +4,8 @@ import {Messages} from "../utils/Messages";
 export class LoggingService {
 
     public static initializeLogFile() {
-        require('child_process').exec("sudo rm -f /opt/logfile.txt", function (msg) {
-            console.log(msg)
-        });
-        require('child_process').exec("sudo touch /opt/logfile.txt", function (msg) {
-            console.log(msg)
-        });
+        require('child_process').exec("sudo rm -f /opt/logfile.txt", function (msg) {});
+        require('child_process').exec("sudo touch /opt/logfile.txt", function (msg) {});
     }
 
     public static async logError(error: string, command: string, interaction: ChatInputCommandInteraction) {
