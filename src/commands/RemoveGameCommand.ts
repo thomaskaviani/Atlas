@@ -8,11 +8,11 @@ export const RemoveGameCommand: Command = {
     name: "remove-game",
     description: "Removes you as an owner of a boardgame",
     options: [new SlashCommandStringOption()
-        .setName("name")
+        .setName("boardgame")
         .setDescription("Enter the boardgame name")
         .setRequired(true)],
     run: async (client: Client, interaction: ChatInputCommandInteraction) => {
-        let boardgame = interaction.options.get("name").value;
+        let boardgame = interaction.options.get("boardgame").value;
 
         if (typeof boardgame === "string" && boardgame) {
             boardgame = boardgame.toLowerCase();

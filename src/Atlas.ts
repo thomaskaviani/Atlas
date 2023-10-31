@@ -37,6 +37,7 @@ export class Atlas {
     }
 
     private initializeAtlas(): void {
+        LoggingService.initializeLogFile();
         this.discordClient.on('ready', async () => {
             await AtlasService.deleteCommands();
             await AtlasService.addCommands(this.discordClient);

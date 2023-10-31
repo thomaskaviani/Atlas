@@ -22,7 +22,7 @@ export const GamesCommand: Command = {
                 for (let boardGame of CollectionLine.getCapitalizedBoardGameNames(collectionLinesForOwner)) {
                     boardgameString = boardgameString + boardGame + "\n";
                 }
-                const content = username + Messages.HAS_FOLLOWING_GAMES + boardgameString;
+                const content = Messages.bold(username) + Messages.HAS_FOLLOWING_GAMES + boardgameString;
                 await interaction.reply({
                     content,
                     ephemeral: true

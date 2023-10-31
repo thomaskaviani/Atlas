@@ -4,16 +4,23 @@ import {Messages} from "../utils/Messages";
 import {BoardgameService} from "../services/BoardgameService";
 import {OwnerService} from "../services/OwnerService";
 import {AtlasService} from "../services/AtlasService";
+import {LoggingService} from "../services/LoggingService";
 
 export const AddGameCommand: Command = {
     name: "add-game",
     description: "Adds you as an owner of a boardgame",
     options: [new SlashCommandStringOption()
-        .setName("name")
+        .setName("boardgame")
         .setDescription("Enter the boardgame name")
         .setRequired(true)],
     run: async (client: Client, interaction: ChatInputCommandInteraction) => {
-        let boardgame = interaction.options.get("name").value;
+        try {
+            let x = interaction.options.get("naam").value;
+        } catch (err) {
+            LoggingService.logOnFile(err);
+        }
+
+        let boardgame = interaction.options.get("boardgame").value;
         if (typeof boardgame === "string" && boardgame) {
             boardgame = boardgame.toLowerCase();
             if (!await OwnerService.doesOwnerExists(interaction.user.username)) {
@@ -25,7 +32,7 @@ export const AddGameCommand: Command = {
             }
 
             if (!await BoardgameService.doesOwnerHaveGame(boardgame, interaction.user.username)) {
-                const content = Messages.GAME_ADD_OWNER_MESSAGE + boardgame;
+                const content = Messages.GAME_ADD_OWNER_MESSAGE + Messages.bold(boardgame);
                 await BoardgameService.saveCollectionLine(boardgame, interaction.user.username);
                 await interaction.reply({
                     content,
@@ -33,7 +40,7 @@ export const AddGameCommand: Command = {
                 });
                 await AtlasService.updateAtlasMessage(client);
             } else {
-                const content = Messages.ALREADY_OWN_GAME_MESSAGE + boardgame;
+                const content = Messages.ALREADY_OWN_GAME_MESSAGE + Messages.bold(boardgame);
                 await interaction.reply({
                     content,
                     ephemeral: true
