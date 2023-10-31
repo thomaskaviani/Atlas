@@ -1,4 +1,4 @@
-import {ChatInputCommandInteraction, Client} from "discord.js";
+import {ChatInputCommandInteraction, Client, PermissionFlagsBits} from "discord.js";
 import {Command} from "./Command";
 import {Messages} from "../utils/Messages";
 import {LoggingService} from "../services/LoggingService";
@@ -7,6 +7,7 @@ export const RebootCommand: Command = {
     name: "reboot",
     description: "Reboots A.T.L.A.S.",
     options: null,
+    defaultMemberPermissions: [PermissionFlagsBits.Administrator],
     run: async (client: Client, interaction: ChatInputCommandInteraction) => {
         try {
             if (interaction.user.username == "thomaskaviani") {
