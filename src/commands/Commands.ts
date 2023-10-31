@@ -17,5 +17,8 @@ export const Commands: Command[] = [
 ];
 
 export const AutoCompletableCommands: AutoCompletableCommand[] = [
-    AddGameCommand
+    AddGameCommand,
+    RemoveGameCommand,
+    GamesCommand,
+    OwnersCommand
 ]
