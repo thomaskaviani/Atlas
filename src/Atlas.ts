@@ -49,4 +49,4 @@ export class Atlas {
     }
 }
 
-void new Atlas().startup();
+void new Atlas().run();
