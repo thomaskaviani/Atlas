@@ -5,12 +5,11 @@ import {Messages} from "../utils/Messages";
 import {BoardgameService} from "./BoardgameService";
 import {Config} from "../Config";
 import {Commands} from "../commands/Commands";
-import {LoggingService} from "./LoggingService";
 
 export class AtlasService {
-    public static readonly channelId = process.env.DISCORD_HOARD_CHANNEL_ID;
 
     public static async deleteCommands() {
+        console.log(Config.ATLAS_TOKEN);
         const rest = new REST().setToken(Config.ATLAS_TOKEN);
         await rest.put(Routes.applicationCommands(Config.ATLAS_CLIENT_ID), {body: []});
     }
@@ -20,7 +19,7 @@ export class AtlasService {
     }
 
     public static async updateAtlasMessage(client: Client): Promise<void> {
-        client.channels.fetch(AtlasService.channelId).then(async (channel: TextChannel) => {
+        client.channels.fetch(Config.ATLAS_COLLECTION_CHANNEL_ID).then(async (channel: TextChannel) => {
             channel.messages.fetch().then(async messages => {
                 await messages.first()?.delete();
                 const atlasMessage: string = await AtlasService.generateAtlasMessage();

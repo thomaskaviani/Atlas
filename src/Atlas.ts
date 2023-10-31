@@ -1,3 +1,4 @@
+require('dotenv').config();
 import {Messages} from "./utils/Messages";
 import {LoggingService} from './services/LoggingService';
 import {Client, GatewayIntentBits} from "discord.js";
@@ -5,8 +6,6 @@ import interactionCreateListener from './listeners/InteractionCreateListener';
 import messageCreateListener from "./listeners/MessageCreateListener";
 import {AtlasService} from "./services/AtlasService";
 import {Config} from "./Config";
-
-require('dotenv').config();
 
 export class Atlas {
     private readonly discordClient: Client = new Client({
