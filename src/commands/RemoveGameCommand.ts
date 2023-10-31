@@ -3,6 +3,7 @@ import {Command} from "./Command";
 import {Messages} from "../utils/Messages";
 import {BoardgameService} from "../services/BoardgameService";
 import {AtlasService} from "../services/AtlasService";
+import {LoggingService} from "../services/LoggingService";
 
 export const RemoveGameCommand: Command = {
     name: "remove-game",
@@ -12,25 +13,29 @@ export const RemoveGameCommand: Command = {
         .setDescription("Enter the boardgame name")
         .setRequired(true)],
     run: async (client: Client, interaction: ChatInputCommandInteraction) => {
-        let boardgame = interaction.options.get("boardgame").value;
+        try {
+            let boardgame = interaction.options.get("boardgame").value;
 
-        if (typeof boardgame === "string" && boardgame) {
-            boardgame = boardgame.toLowerCase();
-            if (await BoardgameService.doesOwnerHaveGame(boardgame, interaction.user.username)) {
-                await BoardgameService.deleteCollectionLine(boardgame, interaction.user.username);
-                const content = Messages.REMOVED_FROM_GAME + boardgame
-                await interaction.reply({
-                    content,
-                    ephemeral: true
-                });
-                await AtlasService.updateAtlasMessage(client);
-            } else {
-                const content = Messages.DONT_OWN_GAME_MESSAGE + boardgame;
-                await interaction.reply({
-                    content,
-                    ephemeral: true
-                });
+            if (typeof boardgame === "string" && boardgame) {
+                boardgame = boardgame.toLowerCase();
+                if (await BoardgameService.doesOwnerHaveGame(boardgame, interaction)) {
+                    await BoardgameService.deleteCollectionLine(boardgame, interaction);
+                    const content = Messages.REMOVED_FROM_GAME + boardgame
+                    await interaction.reply({
+                        content,
+                        ephemeral: true
+                    });
+                    await AtlasService.updateAtlasMessage(client);
+                } else {
+                    const content = Messages.DONT_OWN_GAME_MESSAGE + boardgame;
+                    await interaction.reply({
+                        content,
+                        ephemeral: true
+                    });
+                }
             }
+        } catch (err) {
+            await LoggingService.logError(err, "reboot", interaction);
         }
     }
 };

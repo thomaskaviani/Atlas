@@ -5,6 +5,7 @@ import {Messages} from "../utils/Messages";
 import {BoardgameService} from "./BoardgameService";
 import {Config} from "../Config";
 import {Commands} from "../commands/Commands";
+import {LoggingService} from "./LoggingService";
 
 export class AtlasService {
     public static readonly channelId = process.env.DISCORD_HOARD_CHANNEL_ID;
@@ -35,7 +36,7 @@ export class AtlasService {
         let boardgames: BoardGame[] = await BoardgameService.retrieveAllBoardGames();
 
         for (let boardgame of boardgames) {
-            let collectionLinesForGame: CollectionLine[] = await BoardgameService.retrieveLinesForBoardGame(boardgame.name);
+            let collectionLinesForGame: CollectionLine[] = await BoardgameService.retrieveLinesForBoardGame(boardgame.name, null);
             let owners: string[] = [];
             for (let collectionLine of collectionLinesForGame) {
                 owners.push(collectionLine.ownerUserName);

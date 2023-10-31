@@ -15,37 +15,36 @@ export const AddGameCommand: Command = {
         .setRequired(true)],
     run: async (client: Client, interaction: ChatInputCommandInteraction) => {
         try {
-            let x = interaction.options.get("naam").value;
+            let boardgame = interaction.options.get("boardgame").value;
+
+            if (typeof boardgame === "string" && boardgame) {
+                boardgame = boardgame.toLowerCase();
+                if (!await OwnerService.doesOwnerExists(interaction)) {
+                    await OwnerService.saveOwner(interaction);
+                }
+
+                if (!await BoardgameService.doesBoardGameExists(boardgame, interaction)) {
+                    await BoardgameService.saveBoardGame(boardgame, 0, interaction);
+                }
+
+                if (!await BoardgameService.doesOwnerHaveGame(boardgame, interaction)) {
+                    const content = Messages.GAME_ADD_OWNER_MESSAGE + Messages.bold(boardgame);
+                    await BoardgameService.saveCollectionLine(boardgame, interaction);
+                    await interaction.reply({
+                        content,
+                        ephemeral: true
+                    });
+                    await AtlasService.updateAtlasMessage(client);
+                } else {
+                    const content = Messages.ALREADY_OWN_GAME_MESSAGE + Messages.bold(boardgame);
+                    await interaction.reply({
+                        content,
+                        ephemeral: true
+                    });
+                }
+            }
         } catch (err) {
-            LoggingService.logOnFile(err);
-        }
-
-        let boardgame = interaction.options.get("boardgame").value;
-        if (typeof boardgame === "string" && boardgame) {
-            boardgame = boardgame.toLowerCase();
-            if (!await OwnerService.doesOwnerExists(interaction.user.username)) {
-                await OwnerService.saveOwner(interaction.user.username);
-            }
-
-            if (!await BoardgameService.doesBoardGameExists(boardgame)) {
-                await BoardgameService.saveBoardGame(boardgame, 0);
-            }
-
-            if (!await BoardgameService.doesOwnerHaveGame(boardgame, interaction.user.username)) {
-                const content = Messages.GAME_ADD_OWNER_MESSAGE + Messages.bold(boardgame);
-                await BoardgameService.saveCollectionLine(boardgame, interaction.user.username);
-                await interaction.reply({
-                    content,
-                    ephemeral: true
-                });
-                await AtlasService.updateAtlasMessage(client);
-            } else {
-                const content = Messages.ALREADY_OWN_GAME_MESSAGE + Messages.bold(boardgame);
-                await interaction.reply({
-                    content,
-                    ephemeral: true
-                });
-            }
+            await LoggingService.logError(err, "add-game", interaction);
         }
     }
 };

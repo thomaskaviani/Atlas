@@ -1,3 +1,6 @@
+import {ChatInputCommandInteraction} from "discord.js";
+import {Messages} from "../utils/Messages";
+
 export class LoggingService {
 
     public static initializeLogFile() {
@@ -9,29 +12,24 @@ export class LoggingService {
         });
     }
 
-    public static logOnFile(message: string) {
-        require('child_process').exec("echo '" + message + "' >> /opt/logfile.txt", function (msg) {
-            console.log(msg)
+    public static async logError(error: string, command: string, interaction: ChatInputCommandInteraction) {
+        let user = "NO-USER";
+        if (interaction) {
+            let content = Messages.ATLAS_ERROR
+            user = interaction.user.username;
+            await interaction.reply({
+                content,
+                ephemeral: true
+            });
+        }
+        let logMessage = Date.now() + "_" + command + "_" + user + ":" + error;
+        require('child_process').exec("echo '" + logMessage + "' >> /opt/logfile.txt", function (msg) {
         });
     }
 
-    public static log(message: string): void {
-        console.log(Date.now() + ":" + message);
-    }
-
-    public static logWithError(message: string, error: any): void {
-        console.log(Date.now() + ":" + message, error);
-    }
-
-    public static logWithBoardgameAndOwner(message: string, boardgame: string, owner: string) {
-        console.log(Date.now() + ":" + message + "-" + boardgame + "-" + owner);
-    }
-
-    public static logWithBoardgame(message: string, boardgame: string) {
-        console.log(Date.now() + ":" + message + "-" + boardgame);
-    }
-
-    public static logWithOwner(message: string, owner: string) {
-        console.log(Date.now() + ":" + message + "-" + owner);
+    public static async log(message: string) {
+        let logMessage = Date.now() + ":" + message;
+        require('child_process').exec("echo '" + logMessage + "' >> /opt/logfile.txt", function (msg) {
+        });
     }
 }

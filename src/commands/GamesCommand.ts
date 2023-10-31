@@ -3,6 +3,7 @@ import {Command} from "./Command";
 import {Messages} from "../utils/Messages";
 import {BoardgameService} from "../services/BoardgameService";
 import CollectionLine from "../domain/CollectionLine";
+import {LoggingService} from "../services/LoggingService";
 
 export const GamesCommand: Command = {
     name: "games",
@@ -12,28 +13,32 @@ export const GamesCommand: Command = {
         .setDescription("Enter the owner's username")
         .setRequired(true)],
     run: async (client: Client, interaction: ChatInputCommandInteraction) => {
-        let username = interaction.options.get("owner").value;
+        try {
+            let username = interaction.options.get("owner").value;
 
-        if (typeof username === "string" && username) {
-            let collectionLinesForOwner: CollectionLine[] = await BoardgameService.retrieveLinesForOwner(username);
-            let boardgameString: string = '';
+            if (typeof username === "string" && username) {
+                let collectionLinesForOwner: CollectionLine[] = await BoardgameService.retrieveLinesForOwner(username, interaction);
+                let boardgameString: string = '';
 
-            if (collectionLinesForOwner?.length > 0) {
-                for (let boardGame of CollectionLine.getCapitalizedBoardGameNames(collectionLinesForOwner)) {
-                    boardgameString = boardgameString + boardGame + "\n";
+                if (collectionLinesForOwner?.length > 0) {
+                    for (let boardGame of CollectionLine.getCapitalizedBoardGameNames(collectionLinesForOwner)) {
+                        boardgameString = boardgameString + boardGame + "\n";
+                    }
+                    const content = Messages.bold(username) + Messages.HAS_FOLLOWING_GAMES + boardgameString;
+                    await interaction.reply({
+                        content,
+                        ephemeral: true
+                    });
+                } else {
+                    const content = Messages.USER_NOT_AN_OWNER_MESSAGE;
+                    await interaction.reply({
+                        content,
+                        ephemeral: true
+                    });
                 }
-                const content = Messages.bold(username) + Messages.HAS_FOLLOWING_GAMES + boardgameString;
-                await interaction.reply({
-                    content,
-                    ephemeral: true
-                });
-            } else {
-                const content = Messages.USER_NOT_AN_OWNER_MESSAGE;
-                await interaction.reply({
-                    content,
-                    ephemeral: true
-                });
             }
+        } catch (err) {
+            await LoggingService.logError(err, "reboot", interaction);
         }
     }
 };

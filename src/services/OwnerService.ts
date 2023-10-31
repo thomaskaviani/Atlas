@@ -1,35 +1,29 @@
 import Owner from "../domain/Owner";
 import {LoggingService} from "./LoggingService";
-import {Logging} from "../utils/Logging";
+import {ChatInputCommandInteraction} from "discord.js";
 
 export class OwnerService {
 
-    public static async retrieveOwner(owner: string): Promise<Owner | null> {
+    public static async retrieveOwner(interaction: ChatInputCommandInteraction): Promise<Owner | null> {
         try {
-            LoggingService.logWithOwner(Logging.OWNER_RETRIEVING, owner);
-
-            return await Owner.findByPk(owner);
-        } catch (error) {
-            LoggingService.logWithOwner(Logging.OWNER_RETRIEVAL_FAILED, owner);
-            throw new Error();
+            return await Owner.findByPk(interaction.user.username);
+        } catch (err) {
+            await LoggingService.logError(err, "retrieve-owner", interaction);
         }
     }
 
-    public static async doesOwnerExists(username: string) {
-        const owner: Owner = await this.retrieveOwner(username);
+    public static async doesOwnerExists(interaction: ChatInputCommandInteraction) {
+        const owner: Owner = await this.retrieveOwner(interaction);
         return owner != undefined;
     }
 
-    public static async saveOwner(owner: string): Promise<Owner> {
+    public static async saveOwner(interaction: ChatInputCommandInteraction): Promise<Owner> {
         try {
-            LoggingService.logWithOwner(Logging.OWNER_SAVING, owner);
-
             return await Owner.create({
-                username: owner
+                username: interaction.user.username
             });
         } catch (err) {
-            LoggingService.logWithOwner(Logging.OWNER_SAVED_FAILED, owner);
-            throw new Error();
+            await LoggingService.logError(err, "save-owner", interaction);
         }
     }
 }

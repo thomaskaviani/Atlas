@@ -1,114 +1,103 @@
 import BoardGame from "../domain/BoardGame";
 import {LoggingService} from "./LoggingService";
-import {Logging} from "../utils/Logging";
 import CollectionLine from "../domain/CollectionLine";
 import {Op} from "sequelize";
+import {ChatInputCommandInteraction} from "discord.js";
 
 export class BoardgameService {
 
-    public static async retrieveBoardGame(boardgame: string): Promise<BoardGame | null> {
+    public static async retrieveBoardGame(boardgame: string, interaction: ChatInputCommandInteraction): Promise<BoardGame | null> {
         try {
-            LoggingService.logWithBoardgame(Logging.BOARDGAME_RETRIEVING, boardgame);
             return await BoardGame.findByPk(boardgame);
-        } catch (error) {
-            LoggingService.logWithBoardgame(Logging.BOARDGAME_RETRIEVAL_FAILED, boardgame);
-            throw new Error();
+        } catch (err) {
+            await LoggingService.logError(err, "retrieve-boardgame", interaction);
         }
     }
 
     public static async retrieveAllBoardGames(): Promise<BoardGame[] | null> {
         try {
-            LoggingService.log(Logging.BOARDGAME_RETRIEVING);
             return await BoardGame.findAll();
-        } catch (error) {
-            LoggingService.log(Logging.BOARDGAME_RETRIEVAL_FAILED);
-            throw new Error();
+        } catch (err) {
+            await LoggingService.logError(err, "retrieve-boardgames", null);
         }
     }
 
-    public static async retrieveLinesForOwnerAndBoardGame(boardgame: string, owner: string): Promise<CollectionLine[] | null> {
+    public static async retrieveLinesForOwnerAndBoardGame(boardgame: string, interaction: ChatInputCommandInteraction): Promise<CollectionLine[] | null> {
         try {
-            LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_RETRIEVING, boardgame, owner);
             let condition: any = {};
             condition.boardGameName = {[Op.eq]: boardgame};
-            condition.ownerUserName = {[Op.eq]: owner};
+            condition.ownerUserName = {[Op.eq]: interaction.user.username};
 
             return await CollectionLine.findAll({where: condition});
-        } catch (error) {
-            LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_RETRIEVAL_FAILED, boardgame, owner);
-            throw new Error();
+        } catch (err) {
+            await LoggingService.logError(err, "retrieve-collection-line", interaction);
         }
     }
 
-    public static async retrieveLinesForBoardGame(boardgame: string): Promise<CollectionLine[] | null> {
+    public static async retrieveLinesForBoardGame(boardgame: string, interaction: ChatInputCommandInteraction): Promise<CollectionLine[] | null> {
         try {
-            LoggingService.logWithBoardgame(Logging.COLLECTION_LINE_RETRIEVING, boardgame);
             let condition: any = {};
             condition.boardGameName = {[Op.eq]: boardgame};
 
             return await CollectionLine.findAll({where: condition});
-        } catch (error) {
-            LoggingService.logWithBoardgame(Logging.COLLECTION_LINE_RETRIEVAL_FAILED, boardgame);
-            throw new Error();
+        } catch (err) {
+            await LoggingService.logError(err, "retrieve-collection-line", interaction);
         }
     }
 
-    public static async retrieveLinesForOwner(owner: string): Promise<CollectionLine[] | null> {
+    public static async retrieveLinesForOwner(owner: string, interaction: ChatInputCommandInteraction): Promise<CollectionLine[] | null> {
         try {
-            LoggingService.logWithOwner(Logging.COLLECTION_LINE_RETRIEVING, owner);
             let condition: any = {};
             condition.ownerUserName = {[Op.eq]: owner};
 
             return await CollectionLine.findAll({where: condition});
-        } catch (error) {
-            LoggingService.logWithOwner(Logging.COLLECTION_LINE_RETRIEVAL_FAILED, owner);
-            throw new Error();
+        } catch (err) {
+            await LoggingService.logError(err, "retrieve-collection-line", interaction);
         }
     }
 
-    public static async saveBoardGame(boardgame: string, players: number): Promise<BoardGame> {
+    public static async saveBoardGame(boardgame: string, players: number, interaction: ChatInputCommandInteraction): Promise<BoardGame> {
         try {
-            LoggingService.logWithBoardgame(Logging.BOARDGAME_SAVING, boardgame);
-
             return await BoardGame.create({
                 name: boardgame,
                 players: players,
             });
         } catch (err) {
-            LoggingService.logWithBoardgame(Logging.BOARDGAME_SAVED_FAILED, boardgame);
-            throw new Error();
+            await LoggingService.logError(err, "save-boardgame", interaction);
         }
     }
 
-    public static async saveCollectionLine(boardgame: string, owner: string): Promise<CollectionLine> {
+    public static async saveCollectionLine(boardgame: string, interaction: ChatInputCommandInteraction): Promise<CollectionLine> {
         try {
-            LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_CREATING, boardgame, owner);
             return await CollectionLine.create({
                 boardGameName: boardgame,
-                ownerUserName: owner
+                ownerUserName: interaction.user.username
             });
         } catch (err) {
-            LoggingService.logWithBoardgameAndOwner(Logging.COLLECTION_LINE_CREATED_FAILED, boardgame, owner);
-            throw new Error();
+            await LoggingService.logError(err, "save-collection-line", interaction);
         }
     }
 
-    public static async deleteCollectionLine(boardgame: string, owner: string) {
-        await CollectionLine.destroy({
-            where: {
-                boardGameName: boardgame,
-                ownerUserName: owner
-            }
-        });
+    public static async deleteCollectionLine(boardgame: string, interaction: ChatInputCommandInteraction) {
+        try {
+            await CollectionLine.destroy({
+                where: {
+                    boardGameName: boardgame,
+                    ownerUserName: interaction.user.username
+                }
+            });
+        } catch (err) {
+            await LoggingService.logError(err, "delete-collection-line", interaction);
+        }
     }
 
-    public static async doesBoardGameExists(name: string) {
-        const boardgame: BoardGame = await BoardgameService.retrieveBoardGame(name);
+    public static async doesBoardGameExists(name: string, interaction: ChatInputCommandInteraction) {
+        const boardgame: BoardGame = await BoardgameService.retrieveBoardGame(name, interaction);
         return boardgame != undefined;
     }
 
-    public static async doesOwnerHaveGame(boardgame: string, owner: string): Promise<boolean> {
-        const collectionLines: CollectionLine[] = await BoardgameService.retrieveLinesForOwnerAndBoardGame(boardgame, owner);
+    public static async doesOwnerHaveGame(boardgame: string, interaction: ChatInputCommandInteraction): Promise<boolean> {
+        const collectionLines: CollectionLine[] = await BoardgameService.retrieveLinesForOwnerAndBoardGame(boardgame, interaction);
         return collectionLines.length > 0;
     }
 }

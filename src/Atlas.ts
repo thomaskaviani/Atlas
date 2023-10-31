@@ -1,11 +1,12 @@
-require('dotenv').config();
+import {Messages} from "./utils/Messages";
 import {LoggingService} from './services/LoggingService';
 import {Client, GatewayIntentBits} from "discord.js";
-import {Logging} from "./utils/Logging";
 import interactionCreateListener from './listeners/InteractionCreateListener';
 import messageCreateListener from "./listeners/MessageCreateListener";
 import {AtlasService} from "./services/AtlasService";
 import {Config} from "./Config";
+
+require('dotenv').config();
 
 export class Atlas {
     private readonly discordClient: Client = new Client({
@@ -16,14 +17,14 @@ export class Atlas {
         ]
     });
 
-    public startup(): void {
+    public async startup(): Promise<void> {
         Config.SEQUELIZE.authenticate()
             .then(() => {
-                LoggingService.log(Logging.ATLAS_CONNECTED_DB);
+                LoggingService.log(Messages.ATLAS_CONNECTED_DB);
                 void this.run();
             })
             .catch((err) => {
-                LoggingService.logWithError(Logging.ATLAS_CONNECTING_FAILED, err)
+                LoggingService.logError(err, "database", null);
             });
     }
 
@@ -41,9 +42,11 @@ export class Atlas {
         this.discordClient.on('ready', async () => {
             await AtlasService.deleteCommands();
             await AtlasService.addCommands(this.discordClient);
-            LoggingService.log(Logging.ATLAS_INITIALIZED);
+            await LoggingService.log(Messages.ATLAS_INITIALIZED);
             await AtlasService.updateAtlasMessage(this.discordClient);
+            await LoggingService.log(Messages.ATLAS_CHANNEL_FOUND);
         });
     }
 }
-void new Atlas().run();
+
+void new Atlas().startup();

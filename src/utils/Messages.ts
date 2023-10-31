@@ -34,6 +34,12 @@ export class Messages {
     public static readonly REMOVED_FROM_GAME = "I removed you as an owner of ";
     public static readonly DONT_OWN_GAME_MESSAGE = "You don't own the game ";
 
+    //ERROR HANDLING
+    public static readonly ATLAS_ERROR = "Something went terribly wrong, contact the A.T.L.A.S. creator";
+    public static readonly ATLAS_INITIALIZED = 'A.T.L.A.S. INITIALIZED';
+    public static readonly ATLAS_CONNECTED_DB = 'A.T.L.A.S. CONNECTED TO DATABASE';
+    public static readonly ATLAS_CHANNEL_FOUND = 'A.T.L.A.S. CHANNEL FOUND';
+
     public static capitalize(message: string): string {
         return message.toLowerCase().replace(/(?:^|\s|["'([{])+\S/g, match => match.toUpperCase());
     }
