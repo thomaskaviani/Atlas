@@ -9,7 +9,7 @@ export const RebootCommand: Command = {
     run: async (client: Client, interaction: ChatInputCommandInteraction) => {
         if (interaction.user.username == "thomaskaviani") {
             const content = Messages.ATLAS_REBOOT_MESSAGE;
-            await interaction.followUp({
+            await interaction.reply({
                 ephemeral: true,
                 content
             });
@@ -18,7 +18,7 @@ export const RebootCommand: Command = {
             });
         } else {
             const content = Messages.ATLAS_NOT_ALLOWED;
-            await interaction.followUp({
+            await interaction.reply({
                 ephemeral: true,
                 content
             });
