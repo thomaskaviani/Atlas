@@ -17,7 +17,7 @@ export class Atlas {
         ]
     });
 
-    public async startup(): Promise<void> {
+    public startup(): void {
         Config.SEQUELIZE.authenticate()
             .then(() => {
                 LoggingService.log(Messages.ATLAS_CONNECTED_DB);
@@ -48,5 +48,4 @@ export class Atlas {
         });
     }
 }
-
-void new Atlas().run();
+let atlas = new Atlas().run();
