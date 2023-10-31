@@ -1,5 +1,4 @@
 import {AutocompleteInteraction, ChatInputCommandInteraction, Client, SlashCommandStringOption} from "discord.js";
-import {Command} from "./Command";
 import {Messages} from "../utils/Messages";
 import {BoardgameService} from "../services/BoardgameService";
 import {AtlasService} from "../services/AtlasService";
@@ -20,7 +19,7 @@ export const RemoveGameCommand: AutoCompletableCommand = {
             const boardgames = (await BoardgameService.retrieveLinesForOwner(interaction.user.username, interaction)).map(x => x.boardGameName);
             const filtered = boardgames.filter(choice => choice.startsWith(focusedValue));
             await interaction.respond(
-                filtered.map(choice => ({ name: choice, value: choice })),
+                filtered.map(choice => ({name: choice, value: choice})),
             );
         } catch (err) {
             await LoggingService.logError(err, "autocomplete-remove-game", interaction);
