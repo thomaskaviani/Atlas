@@ -5,6 +5,7 @@ import {AddGameCommand} from "./AddGameCommand";
 import {RemoveGameCommand} from "./RemoveGameCommand";
 import {GamesCommand} from "./GamesCommand";
 import {OwnersCommand} from "./OwnersCommand";
+import {AutoCompletableCommand} from "./AutoCompletableCommand";
 
 export const Commands: Command[] = [
     AtlasCommand,
@@ -14,3 +15,7 @@ export const Commands: Command[] = [
     GamesCommand,
     OwnersCommand
 ];
+
+export const AutoCompletableCommands: AutoCompletableCommand[] = [
+    AddGameCommand
+]

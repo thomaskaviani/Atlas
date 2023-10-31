@@ -1,4 +1,4 @@
-import {ChatInputCommandInteraction} from "discord.js";
+import {ChatInputCommandInteraction, Interaction} from "discord.js";
 import {Messages} from "../utils/Messages";
 
 export class LoggingService {
@@ -8,9 +8,10 @@ export class LoggingService {
         require('child_process').exec("sudo touch /opt/logfile.txt", function () {});
     }
 
-    public static async logError(error: string, command: string, interaction: ChatInputCommandInteraction) {
+    public static async logError(error: string, command: string, interaction: Interaction) {
         let user = "NO-USER";
-        if (interaction) {
+        if (interaction.isChatInputCommand()) {
+            interaction = <ChatInputCommandInteraction>interaction;
             let content = Messages.ATLAS_ERROR
             user = interaction.user.username;
             await interaction.reply({
