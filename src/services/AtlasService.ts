@@ -22,7 +22,7 @@ export class AtlasService {
         client.channels.fetch(Config.ATLAS_COLLECTION_CHANNEL_ID).then(async (channel: TextChannel) => {
             channel.messages.fetch().then(async messages => {
                 await messages.first()?.delete();
-                const atlasMessage: string = await AtlasService.generateAtlasMessage();
+                const atlasMessage: string = await AtlasService.generateTempAtlasMessage();
                 if (atlasMessage.length != 0) {
                     await channel.send({content: atlasMessage, flags: [4096]});
                 }
@@ -53,6 +53,14 @@ export class AtlasService {
 
         return '# The Collection 🎲🏰🧙‍♂️\n\n'
             + 'This is a collection of all the boardgames I know of. Feel free to add games by using A.T.L.A.S in other channels with the proper commands.\n'
+            + 'You can always find out how to use A.T.L.A.S by typing **!atlas** \n\n'
+            + Messages.getBoardgameBoxes(boardgameMap) + "\n\n";
+    }
+
+    private static async generateTempAtlasMessage(): Promise<string> {
+        return '# ⚠ Under Construction ⚠\n\n'
+            + 'This is a warning message, the game collection can currently not be displayed.\n'
+            + 'All the atlas commands are still available while we are figuring out the problem.\n'
             + 'You can always find out how to use A.T.L.A.S by typing **!atlas** \n\n'
             + Messages.getBoardgameBoxes(boardgameMap) + "\n\n";
     }
