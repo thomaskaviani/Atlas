@@ -21,11 +21,9 @@ export class AtlasService {
     public static async updateAtlasMessage(client: Client): Promise<void> {
         client.channels.fetch(Config.ATLAS_COLLECTION_CHANNEL_ID).then(async (channel: TextChannel) => {
             channel.messages.fetch().then(async messages => {
-                await messages.first()?.delete();
-                const atlasMessage: string = await AtlasService.generateTempAtlasMessage();
-                if (atlasMessage.length != 0) {
-                    await channel.send({content: atlasMessage, flags: [4096]});
-                }
+                channel.bulkDelete(messages);
+                await AtlasService.generateAtlasMessages(channel);
+                //await channel.send({content: Messages.getBoardGameCollectionErrorMessage(), flags: [4096]});
             });
         });
     }
@@ -36,7 +34,29 @@ export class AtlasService {
         });
     }
 
-    private static async generateAtlasMessage(): Promise<string> {
+    private static async generateAtlasMessages(channel: TextChannel): Promise<void> {
+        let boardgameMap: Map<string, string[]> = await AtlasService.getBoardGameMap();
+
+        //Send intro message
+        channel.send({content: Messages.getBoardGameCollectionIntroMessage(), flags: [4096]});
+
+        //Sends Boardgames in messages no bigger than 2000
+        let atlasMessage = '';
+        for (let entry of boardgameMap.entries()) {
+            if (atlasMessage != '') {
+                if ((atlasMessage + '\n' + Messages.getBoardgameBox(entry)).length < 2000) {
+                    atlasMessage = atlasMessage + '\n' + Messages.getBoardgameBox(entry);
+                } else {
+                    channel.send({content: Messages.getBoardGameCollectionIntroMessage(), flags: [4096]});
+                    atlasMessage = Messages.getBoardgameBox(entry);
+                }
+            } else {
+                atlasMessage = Messages.getBoardgameBox(entry);
+            }
+        }
+    }
+
+    private static async getBoardGameMap(): Promise<Map<string, string[]>> {
         let boardgameMap: Map<string, string[]> = new Map<string, string[]>();
         let boardgames: BoardGame[] = await BoardgameService.retrieveAllBoardGames();
 
@@ -50,17 +70,9 @@ export class AtlasService {
                 boardgameMap.set(Messages.capitalize(boardgame.name), owners);
             }
         }
-
-        return '# The Collection 🎲🏰🧙‍♂️\n\n'
-            + 'This is a collection of all the boardgames I know of. Feel free to add games by using A.T.L.A.S in other channels with the proper commands.\n'
-            + 'You can always find out how to use A.T.L.A.S by typing **!atlas** \n\n'
-            + Messages.getBoardgameBoxes(boardgameMap) + "\n\n";
+        boardgameMap = new Map([...boardgameMap.entries()].sort());
+        return boardgameMap;
     }
 
-    private static async generateTempAtlasMessage(): Promise<string> {
-        return '# ⚠ Under Construction ⚠\n\n'
-            + 'This is a warning message, the game collection can currently not be displayed.\n'
-            + 'All the atlas commands are still available while we are figuring out the problem.\n'
-            + 'You can always find out how to use A.T.L.A.S by typing **!atlas** \n\n';
-    }
+    
 }

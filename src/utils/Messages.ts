@@ -49,20 +49,7 @@ export class Messages {
         return "**" + message + "**";
     }
 
-    public static getBoardgameBoxes(boardgameMap: Map<string, string[]>) {
-        boardgameMap = new Map([...boardgameMap.entries()].sort());
-        let boardgameBoxes = '';
-        for (let entry of boardgameMap.entries()) {
-            if (boardgameBoxes != '') {
-                boardgameBoxes = boardgameBoxes + '\n' + Messages.getBoardgameBox(entry);
-            } else {
-                boardgameBoxes = Messages.getBoardgameBox(entry);
-            }
-        }
-        return boardgameBoxes;
-    }
-
-    private static getBoardgameBox(entry: [string, string[]]): string {
+    public static getBoardgameBox(entry: [string, string[]]): string {
         let boardGameBox = '**' + entry[0] + '**\n';
         let authorsLine = '``` ';
         for (let username of entry[1]) {
@@ -73,5 +60,19 @@ export class Messages {
             }
         }
         return boardGameBox + authorsLine + ' ```';
+    }
+
+    public static getBoardGameCollectionIntroMessage() {
+        return '# The Collection 🎲🏰🧙‍♂️\n\n'
+            + 'This is a collection of all the boardgames I know of. Feel free to add games by using A.T.L.A.S in other channels with the proper commands.\n'
+            + 'You can always find out how to use A.T.L.A.S by typing **!atlas**';
+    }
+
+    //To use when working on game collection messages
+    public static getBoardGameCollectionErrorMessage() {
+        return '# ⚠ Under Construction ⚠\n\n'
+            + 'This is a warning message, the game collection can currently not be displayed.\n'
+            + 'All the atlas commands are still available while we are figuring out the problem.\n'
+            + 'You can always find out how to use A.T.L.A.S by typing **!atlas** \n\n';
     }
 }
