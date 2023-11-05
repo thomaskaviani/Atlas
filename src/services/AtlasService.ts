@@ -38,7 +38,7 @@ export class AtlasService {
         let boardgameMap: Map<string, string[]> = await AtlasService.getBoardGameMap();
 
         //Send intro message
-        channel.send({content: Messages.getBoardGameCollectionIntroMessage(), flags: [4096]});
+        await channel.send({content: Messages.getBoardGameCollectionIntroMessage(), flags: [4096]});
 
         //Sends Boardgames in messages no bigger than 2000
         let atlasMessage = '';
@@ -47,14 +47,17 @@ export class AtlasService {
                 if ((atlasMessage + '\n' + Messages.getBoardgameBox(entry)).length < 2000) {
                     atlasMessage = atlasMessage + '\n' + Messages.getBoardgameBox(entry);
                 } else {
-                    channel.send({content: Messages.getBoardGameCollectionIntroMessage(), flags: [4096]});
+                    await channel.send({content: atlasMessage, flags: [4096]});
                     atlasMessage = Messages.getBoardgameBox(entry);
                 }
             } else {
                 atlasMessage = Messages.getBoardgameBox(entry);
             }
         }
-    }
+        if (atlasMessage != '') {
+            await channel.send({content: atlasMessage, flags: [4096]});
+        }
+    } 
 
     private static async getBoardGameMap(): Promise<Map<string, string[]>> {
         let boardgameMap: Map<string, string[]> = new Map<string, string[]>();
