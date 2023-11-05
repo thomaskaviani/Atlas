@@ -61,7 +61,6 @@ export class AtlasService {
         return '# ⚠ Under Construction ⚠\n\n'
             + 'This is a warning message, the game collection can currently not be displayed.\n'
             + 'All the atlas commands are still available while we are figuring out the problem.\n'
-            + 'You can always find out how to use A.T.L.A.S by typing **!atlas** \n\n'
-            + Messages.getBoardgameBoxes(boardgameMap) + "\n\n";
+            + 'You can always find out how to use A.T.L.A.S by typing **!atlas** \n\n';
     }
 }
