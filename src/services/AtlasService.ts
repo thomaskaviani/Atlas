@@ -38,7 +38,7 @@ export class AtlasService {
         let boardgameMap: Map<string, string[]> = await AtlasService.getBoardGameMap();
 
         //Send intro message
-        await channel.send({content: Messages.getBoardGameCollectionIntroMessage(), flags: [4096]});
+        //await channel.send({content: Messages.getBoardGameCollectionIntroMessage(), flags: [4096]});
 
         //Sends Boardgames in messages no bigger than 2000
         let atlasMessage = '';
